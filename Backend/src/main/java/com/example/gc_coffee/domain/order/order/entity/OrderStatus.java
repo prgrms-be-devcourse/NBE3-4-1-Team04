@@ -8,6 +8,6 @@ import lombok.Getter;
 public enum OrderStatus {
     YET,
     DONE,
-    CACELED
+    CANCELED
 
 }
