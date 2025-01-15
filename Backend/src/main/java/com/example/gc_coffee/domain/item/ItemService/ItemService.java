@@ -9,6 +9,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -38,5 +39,9 @@ public class ItemService {
     public Page<Item> findByPaged(int page, int pageSize) {
         PageRequest pageRequest = PageRequest.of(page - 1, pageSize);
         return itemRepository.findAll(pageRequest);
+    }
+
+    public Optional<Item> findById(long itemId) {
+        return itemRepository.findById(itemId);
     }
 }

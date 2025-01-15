@@ -5,10 +5,7 @@ import com.example.gc_coffee.domain.item.dto.ItemDto;
 import com.example.gc_coffee.standard.dto.PageDto;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/items")
@@ -29,5 +26,15 @@ public class ItemController {
         );
     }
 
+    // 단건 조회
+    @GetMapping("{item_id}")
+    public ItemDto item(
+            @PathVariable long item_id
+    ) {
+
+        return itemService.findById(item_id)
+                        .map(ItemDto::new)
+                        .orElseThrow();
+    }
 
 }

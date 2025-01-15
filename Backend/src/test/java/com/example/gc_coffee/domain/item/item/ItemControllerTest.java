@@ -32,7 +32,7 @@ public class ItemControllerTest {
     private MockMvc mvc;
 
     @Test
-    @DisplayName("유저 상품 조회")
+    @DisplayName("유저, 상품 조회")
     void t1() throws Exception{
         ResultActions resultActions = mvc
                 .perform(
@@ -47,5 +47,28 @@ public class ItemControllerTest {
                 .andExpect(handler().handlerType(ItemController.class))
                 .andExpect(handler().methodName("items"))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("유저, 상품 단건 조회")
+    void t2() throws Exception{
+        ResultActions resultActions = mvc
+                .perform(
+                        get("/api/items/1")
+                )
+                .andDo(print());
+
+        Item item = itemService.findById(1).get();
+        assertEquals("탄맛 커피콩",item.getItemName());
+
+        resultActions
+                .andExpect(handler().handlerType(ItemController.class))
+                .andExpect(handler().methodName("item"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(item.getId()))
+                .andExpect(jsonPath("$.itemName").value("탄맛 커피콩"))
+                .andExpect(jsonPath("$.itemPrice").value(500))
+                .andExpect(jsonPath("$.quantity").value(10));
+
     }
 }
