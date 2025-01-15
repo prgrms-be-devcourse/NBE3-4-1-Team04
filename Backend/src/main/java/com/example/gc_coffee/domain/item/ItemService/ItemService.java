@@ -4,6 +4,8 @@ import com.example.gc_coffee.domain.item.entity.Category;
 import com.example.gc_coffee.domain.item.entity.Item;
 import com.example.gc_coffee.domain.item.repository.ItemRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -31,5 +33,10 @@ public class ItemService {
 
     public List<Item> findByAll() {
         return itemRepository.findAll();
+    }
+
+    public Page<Item> findByPaged(int page, int pageSize) {
+        PageRequest pageRequest = PageRequest.of(page - 1, pageSize);
+        return itemRepository.findAll(pageRequest);
     }
 }

@@ -36,7 +36,7 @@ public class ItemControllerTest {
     void t1() throws Exception{
         ResultActions resultActions = mvc
                 .perform(
-                        get("/api/items")
+                        get("/api/items?page=1&pageSize=4")
                 )
                 .andDo(print());
 
