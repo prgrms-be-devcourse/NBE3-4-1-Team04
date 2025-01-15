@@ -8,6 +8,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "cart")
 @Builder
@@ -21,6 +24,7 @@ public class Cart extends BaseEntity {
 
     private int quantity;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Item item;
+    @OneToMany(mappedBy = "cart", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
+    @Builder.Default
+    private List<Item> items = new ArrayList<>();
 }

@@ -6,6 +6,8 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum OrderStatus {
-
+    YET,
+    DONE,
+    CACELED
 
 }

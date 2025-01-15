@@ -1,14 +1,11 @@
 package com.example.gc_coffee.domain.item.entity;
 
-import com.example.gc_coffee.domain.order.orderItem.entity.OrderItem;
+import com.example.gc_coffee.domain.cart.entity.Cart;
 import com.example.gc_coffee.global.jpa.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name = "items")
@@ -31,7 +28,7 @@ public class Item extends BaseEntity {
 
     private int quantity;
 
-    @OneToMany(mappedBy = "item", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
-    @Builder.Default
-    private List<OrderItem> orderItems = new ArrayList<>();
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cart_id")
+    private Cart cart;
 }
