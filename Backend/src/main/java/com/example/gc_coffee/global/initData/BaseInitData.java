@@ -22,13 +22,13 @@ public class BaseInitData {
     @Bean
     public ApplicationRunner BaseInitDataApplicationRunner() {
         return args -> {
-            self.sampleData1();
-            self.sampleData2();
+            self.itemSampleData1();
+            self.itemSampleData2();
         };
     }
 
     @Transactional
-    public void sampleData1() {
+    public void itemSampleData1() {
         if (itemService.count() > 0) return ;
 
         itemService.addItem(Category.COFFEE_BEAN, "탄맛 커피콩", 500, "탄맛 커피콩 사진", 10);
@@ -39,7 +39,7 @@ public class BaseInitData {
     }
 
     @Transactional
-    public void sampleData2() {
+    public void itemSampleData2() {
 
     }
 }

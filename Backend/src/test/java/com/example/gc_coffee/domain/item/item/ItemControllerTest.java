@@ -40,7 +40,7 @@ public class ItemControllerTest {
                 )
                 .andDo(print());
 
-        List<Item> items = itemService.findByAll();
+        List<Item> items = itemService.findAllByOrderByIdDesc();
         assertEquals(4, items.size());
 
         resultActions
@@ -69,6 +69,31 @@ public class ItemControllerTest {
                 .andExpect(jsonPath("$.itemName").value("탄맛 커피콩"))
                 .andExpect(jsonPath("$.itemPrice").value(500))
                 .andExpect(jsonPath("$.quantity").value(10));
+
+    }
+
+    @Test
+    @DisplayName("유저, 상품 상세 조회")
+    void t3() throws Exception{
+        ResultActions resultActions = mvc
+                .perform(
+                        get("/api/items/1/details")
+                )
+                .andDo(print());
+
+        Item item = itemService.findById(1).get();
+        assertEquals("탄맛 커피콩",item.getItemName());
+
+        resultActions
+                .andExpect(handler().handlerType(ItemController.class))
+                .andExpect(handler().methodName("itemDetails"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(item.getId()))
+                .andExpect(jsonPath("$.category").value("COFFEE_BEAN"))
+                .andExpect(jsonPath("$.itemName").value("탄맛 커피콩"))
+                .andExpect(jsonPath("$.itemPrice").value(500))
+                .andExpect(jsonPath("$.quantity").value(10));
+                // todo: 상품 상세 설명 들어가 코드 필요함
 
     }
 }

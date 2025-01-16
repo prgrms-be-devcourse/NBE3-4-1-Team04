@@ -32,8 +32,8 @@ public class ItemService {
         return itemRepository.count();
     }
 
-    public List<Item> findByAll() {
-        return itemRepository.findAll();
+    public List<Item> findAllByOrderByIdDesc() {
+        return itemRepository.findAllByOrderByIdDesc();
     }
 
     public Page<Item> findByPaged(int page, int pageSize) {

@@ -30,6 +30,9 @@ public class Item extends BaseEntity {
 
     private int quantity;
 
+    // todo: 별도 관리해야할지 고민
+    private String itemDescription;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cart_id")
     private Cart cart;
