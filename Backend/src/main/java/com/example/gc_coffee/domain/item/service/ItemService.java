@@ -61,17 +61,19 @@ public class ItemService {
         item.setItemImage(itemImage);
         item.setQuantity(itemQuantity);
         item.setItemDescription(description);
+
+        itemRepository.save(item);
     }
 
-    public void delete(Item item4) {
-        itemRepository.delete(item4);
+    public void delete(Item item) {
+        itemRepository.delete(item);
     }
 
     public void flush() {
         itemRepository.flush();
     }
 
-    public Optional<Item> fineLaTest() {
+    public Optional<Item> fineLatest() {
         return itemRepository.findFirstByOrderByIdDesc();
     }
 }

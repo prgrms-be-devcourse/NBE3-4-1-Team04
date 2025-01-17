@@ -97,7 +97,7 @@ public class ItemControllerTest {
                 )
                 .andDo(print());
 
-        Item item = itemService.fineLaTest().get();
+        Item item = itemService.fineLatest().get();
         assertThat(item.getItemName()).isEqualTo("과자에 차 한잔?");
 
         resultActions
@@ -118,23 +118,37 @@ public class ItemControllerTest {
     void t4() throws Exception{
         ResultActions resultActions = mvc
                 .perform(
-                        get("/api/items/1/details")
+                        patch("/api/items/1")
+                                .content("""
+                                        {
+                                            "category":"COFFEE",
+                                            "itemName":"아침엔 모닝커피?",
+                                            "itemPrice":500,
+                                            "itemImage":"모닝 커피를 먹는 사람의 사진",
+                                            "itemQuantity":100,
+                                            "itemDescription":"어서오세요~"
+                                        }
+                                        """)
+                                .contentType(
+                                        new MediaType(MediaType.APPLICATION_JSON, StandardCharsets.UTF_8)
+                                )
                 )
                 .andDo(print());
 
         Item item = itemService.findById(1).get();
-        assertEquals("탄맛 커피콩",item.getItemName());
+        assertEquals("아침엔 모닝커피?",item.getItemName());
 
         resultActions
                 .andExpect(handler().handlerType(ItemController.class))
-                .andExpect(handler().methodName("itemDetails"))
+                .andExpect(handler().methodName("modifyItem"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(item.getId()))
-                .andExpect(jsonPath("$.category").value("COFFEE_BEAN"))
-                .andExpect(jsonPath("$.itemName").value("탄맛 커피콩"))
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.category").value("COFFEE"))
+                .andExpect(jsonPath("$.itemName").value("아침엔 모닝커피?"))
                 .andExpect(jsonPath("$.itemPrice").value(500))
-                .andExpect(jsonPath("$.quantity").value(10));
-
+                .andExpect(jsonPath("$.itemImage").value("모닝 커피를 먹는 사람의 사진"))
+                .andExpect(jsonPath("$.quantity").value(100))
+                .andExpect(jsonPath("$.itemDescription").value("어서오세요~"));
     }
 
     @Test

@@ -86,10 +86,10 @@ public class ItemController {
     }
 
     // 상품 수정
-    @PatchMapping("/item_id")
+    @PatchMapping("/{item_id}")
     @Transactional
     public ResponseEntity<ItemDescriptionDto> modifyItem(
-            @RequestParam int item_id,
+            @PathVariable long item_id,
             @RequestBody ItemReqBody reqBody
     ) {
         Item item = itemService.findById(item_id).get();
@@ -113,9 +113,9 @@ public class ItemController {
     }
 
     // 상품 삭제
-    @DeleteMapping("/item_id")
+    @DeleteMapping("/{item_id}")
     @Transactional
-    public ResponseEntity<String> modifyItem(@RequestParam int item_id) {
+    public ResponseEntity<String> modifyItem(@PathVariable long item_id) {
 
         Item item = itemService.findById(item_id).get();
 
