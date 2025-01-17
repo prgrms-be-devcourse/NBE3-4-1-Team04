@@ -18,13 +18,13 @@ class GcCoffeeApplicationTests {
 	private MockMvc mvc;
 
 	@Test
-	@DisplayName("테스트 샘플")
+	@DisplayName("유저 상품 조회")
 	void test() throws Exception{
+
 		//given
 
 		//when
 
 		//then
 	}
-
 }

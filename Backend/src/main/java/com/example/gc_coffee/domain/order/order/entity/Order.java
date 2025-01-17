@@ -26,8 +26,6 @@ public class Order extends BaseEntity {
 
     private String address;
 
-    private String zipcode;
-
     private LocalDateTime orderTime;
 
     private int orderPrice;

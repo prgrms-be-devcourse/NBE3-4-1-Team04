@@ -1,9 +1,9 @@
 package com.example.gc_coffee.domain.admin.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RestController;
 
 @Service
-@RestController
+@RequiredArgsConstructor // RestController  -> RequiredArgsConstructor으로 변경
 public class AdminService {
 }
