@@ -17,8 +17,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -80,22 +81,24 @@ public class ItemControllerTest {
     void t3() throws Exception{
         ResultActions resultActions = mvc
                 .perform(
-                        get("/api/items")
+                        post("/api/items")
                                 .content("""
+                                        {
                                             "category":"TEA",
                                             "itemName":"과자에 차 한잔?",
                                             "itemPrice":1000,
                                             "itemImage":"사진이 아직 없어요",
                                             "itemQuantity":10,
                                             "itemDescription":"한정판매 합니다."
+                                        }
                                         """)
                                 .contentType(
                                         new MediaType(MediaType.APPLICATION_JSON, StandardCharsets.UTF_8))
                 )
                 .andDo(print());
 
-        List<Item> items = itemService.findAllByOrderByIdDesc();
-        assertEquals(5, items.size());
+        Item item = itemService.fineLaTest().get();
+        assertThat(item.getItemName()).isEqualTo("과자에 차 한잔?");
 
         resultActions
                 .andExpect(handler().handlerType(ItemController.class))

@@ -70,4 +70,8 @@ public class ItemService {
     public void flush() {
         itemRepository.flush();
     }
+
+    public Optional<Item> fineLaTest() {
+        return itemRepository.findFirstByOrderByIdDesc();
+    }
 }
