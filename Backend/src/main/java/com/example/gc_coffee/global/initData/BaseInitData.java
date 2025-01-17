@@ -1,6 +1,6 @@
 package com.example.gc_coffee.global.initData;
 
-import com.example.gc_coffee.domain.item.ItemService.ItemService;
+import com.example.gc_coffee.domain.item.service.ItemService;
 import com.example.gc_coffee.domain.item.entity.Category;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;

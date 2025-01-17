@@ -1,6 +1,6 @@
 package com.example.gc_coffee.domain.item.item;
 
-import com.example.gc_coffee.domain.item.ItemService.ItemService;
+import com.example.gc_coffee.domain.item.service.ItemService;
 import com.example.gc_coffee.domain.item.controller.ItemController;
 import com.example.gc_coffee.domain.item.entity.Item;
 import org.junit.jupiter.api.DisplayName;
@@ -66,16 +66,18 @@ public class ItemControllerTest {
                 .andExpect(handler().methodName("item"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(item.getId()))
+                .andExpect(jsonPath("$.category").value("COFFEE_BEAN"))
                 .andExpect(jsonPath("$.itemName").value("탄맛 커피콩"))
                 .andExpect(jsonPath("$.itemPrice").value(500))
-                .andExpect(jsonPath("$.quantity").value(10));
+                .andExpect(jsonPath("$.quantity").value(10))
+                .andExpect(jsonPath("$.items.itemDescription").doesNotExist());
 
     }
 
     @Test
-    @DisplayName("유저, 상품 상세 조회")
+    @DisplayName("유저, 상품 상세 조회") // t2()에서 단순 조회랑 나눠야 하면 활성화
     void t3() throws Exception{
-        ResultActions resultActions = mvc
+        /*ResultActions resultActions = mvc
                 .perform(
                         get("/api/items/1/details")
                 )
@@ -94,6 +96,6 @@ public class ItemControllerTest {
                 .andExpect(jsonPath("$.itemPrice").value(500))
                 .andExpect(jsonPath("$.quantity").value(10));
                 // todo: 상품 상세 설명 들어가 코드 필요함
-
+*/
     }
 }
