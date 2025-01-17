@@ -26,6 +26,7 @@ public class Item extends BaseEntity {
 
     private String itemImage;
 
+    @Enumerated(value = EnumType.STRING)
     private Category category;
 
     private int quantity;
