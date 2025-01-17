@@ -56,25 +56,6 @@ public class BaseInitData {
                 "탄맛 쥬스", 200,
                 "탄맛 쥬스 사진", 10,
                 "하다하다 쥬스도 ㅋㅋ");
-
-        itemService.modify(
-                item1, Category.COFFEE_BEAN,
-                "짠맛 커피콩", 800,
-                "너무 짜서 눈을 감는 사진", 100,
-                "사실 소금아닐까?");
-
-        itemService.modify(
-                item2, Category.COFFEE,
-                "고구마맛 커피", 1000,
-                "고구마와 커피 사진", 100,
-                "사실 고구마 맛이라네");
-
-        itemService.modify(item3, Category.TEA,
-                "곧 안팔려서 내릴지도 모르는 티", 500,
-                "맛없어 하는 사진", 100,
-                "어우 먹지마");
-
-        itemService.delete(item4);
     }
 
     @Transactional
