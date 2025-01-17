@@ -38,25 +38,15 @@ public class ItemService {
         return itemRepository.findAllByOrderByIdDesc();
     }
 
-    // (조회) 검색어가 없을 경우, 전체 조회
+    // (조회) 전체 조회 및, 상품 이름
     public Page<Item> findByPaged(String searchKeyword, int page, int pageSize) {
-        PageRequest pageRequest = PageRequest.of(page - 1, pageSize, Sort.by(Sort.Order.desc("id")));
-        return itemRepository.findAll(pageRequest);
-    }
-
-    // (조회) %상품, 이메일, 집코드% 조회
-    public Page<Item> findByPaged(String searchKeywordType, String searchKeyword, int page, int pageSize) {
         PageRequest pageRequest = PageRequest.of(page - 1, pageSize, Sort.by(Sort.Order.desc("id")));
 
         if (Ut.str.isBlank(searchKeyword)) { return itemRepository.findAll(pageRequest); }
 
         searchKeyword = "%" + searchKeyword + "%";
 
-        return switch (searchKeywordType) {
-            case "email" -> itemRepository.findByEmailLikeIgnoreCase(searchKeyword, pageRequest);
-            case "zipcode" -> itemRepository.findByZipCodeLikeIgnoreCase(searchKeyword, pageRequest);
-            default -> itemRepository.findByItemNameLikeIgnoreCase(searchKeyword, pageRequest);
-        };
+        return itemRepository.findByItemNameLikeIgnoreCase(searchKeyword, pageRequest);
     }
 
     public Optional<Item> findById(long itemId) {

@@ -27,5 +27,4 @@ public class Cart extends BaseEntity {
     @OneToMany(mappedBy = "cart", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
     @Builder.Default
     private List<Item> items = new ArrayList<>();
-
 }

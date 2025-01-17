@@ -76,7 +76,7 @@ public class ItemControllerTest {
 
 
     @Test
-    @DisplayName("유저, 상품 상세 조회") // t2()에서 단순 조회랑 나눠야 하면 활성화
+    @DisplayName("유저, 상품 상세 조회") // Todo t2()에서 단순 조회랑 나눠야 하면 활성화
     void t3() throws Exception{
         /*ResultActions resultActions = mvc
                 .perform(
@@ -96,7 +96,7 @@ public class ItemControllerTest {
                 .andExpect(jsonPath("$.itemName").value("탄맛 커피콩"))
                 .andExpect(jsonPath("$.itemPrice").value(500))
                 .andExpect(jsonPath("$.quantity").value(10));
-                // todo: 상품 상세 설명 들어가 코드 필요함
+                // Todo: 상품 상세 설명 들어가 코드 필요함
 */
     }
 }

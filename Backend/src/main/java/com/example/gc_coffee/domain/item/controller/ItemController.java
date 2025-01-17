@@ -16,10 +16,8 @@ import org.springframework.web.bind.annotation.*;
 public class ItemController {
     private final ItemService itemService;
 
-    // 다건 및 검색 조회
     @GetMapping
     public ResponseEntity<PageDto<ItemDto>> orderItems(
-            @RequestParam(defaultValue = "itemName") String searchKeywordType,
             @RequestParam(defaultValue = "") String searchKeyword,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "4") int pageSize
@@ -27,7 +25,7 @@ public class ItemController {
         return ResponseEntity.ok()
                 .body(
                 new PageDto<>(
-                        itemService.findByPaged(searchKeywordType, searchKeyword, page, pageSize)
+                        itemService.findByPaged(searchKeyword, page, pageSize)
                                 .map(ItemDto::new)
                 )
         );

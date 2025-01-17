@@ -10,20 +10,20 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @Tag(name = "주문", description = "주문 API")
 public class OrderController {
-//    // 다건 및 검색 조회
-//    @GetMapping
-//    public ResponseEntity<PageDto<ItemDto>> items(
-//            @RequestParam(defaultValue = "itemName") String searchKeywordType,
-//            @RequestParam(defaultValue = "") String searchKeyword,
-//            @RequestParam(defaultValue = "1") int page,
-//            @RequestParam(defaultValue = "4") int pageSize
-//    ) {
-//        return ResponseEntity.ok()
-//                .body(
-//                        new PageDto<>(
-//                                orderService.findByPaged(searchKeywordType, searchKeyword, page, pageSize)
-//                                        .map(ItemDto::new)
-//                        )
-//                );
-//    }
+
+//    @GetMapping Todo orderItems로 조회할 수 있도록 구현
+    /*public ResponseEntity<PageDto<ItemDto>> items(
+            @RequestParam(defaultValue = "itemName") String searchKeywordType,
+            @RequestParam(defaultValue = "") String searchKeyword,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "4") int pageSize
+    ) {
+        return ResponseEntity.ok()
+                .body(
+                        new PageDto<>(
+                                orderService.findByPaged(searchKeywordType, searchKeyword, page, pageSize)
+                                        .map(ItemDto::new)
+                        )
+                );
+    }*/
 }

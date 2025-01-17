@@ -30,7 +30,7 @@ public class Item extends BaseEntity {
 
     private int quantity;
 
-    // todo: 별도 관리해야할지 고민
+    // Todo: 별도 관리해야할지 고민
     private String itemDescription;
 
     @ManyToOne(fetch = FetchType.LAZY)

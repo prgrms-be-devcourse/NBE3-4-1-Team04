@@ -3,11 +3,13 @@ package com.example.gc_coffee.domain.item.dto;
 import com.example.gc_coffee.domain.item.entity.Category;
 import com.example.gc_coffee.domain.item.entity.Item;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
 
 @Getter
+@AllArgsConstructor
 public class ItemDto {
     private Long id;
 

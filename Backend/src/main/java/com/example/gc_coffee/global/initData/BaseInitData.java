@@ -41,11 +41,11 @@ public class BaseInitData {
 
     @Transactional
     public void cartSampleData() {
-        // todo: 장바구니 추가 API 구현 후 테스트_작업자:OS
+        // Todo: 장바구니 추가 API 구현 후 테스트_작업자:OS
     }
 
     @Transactional
     public void orderTestSampleData() {
-        // todo: 주문 API 완료 후 진행_작업자:OS
+        // Todo: 주문 API 완료 후 진행_작업자:OS
     }
 }
