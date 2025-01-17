@@ -33,7 +33,7 @@ public class ItemController {
         );
     }
 
-    // 단건 상세내용 조회
+    // 단건 상세내용 조회 (클릭 시 보이는 화면)
     @GetMapping("/{item_id}")
     public ResponseEntity<ItemDescriptionDto> item(
             @PathVariable long item_id

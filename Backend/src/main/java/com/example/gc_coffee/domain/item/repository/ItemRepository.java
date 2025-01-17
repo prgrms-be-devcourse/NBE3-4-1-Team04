@@ -11,4 +11,8 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
     List<Item> findAllByOrderByIdDesc();
 
     Page<Item> findByItemNameLikeIgnoreCase(String searchKeyword, PageRequest pageRequest);
+
+    Page<Item> findByEmailLikeIgnoreCase(String searchKeyword, PageRequest pageRequest);
+
+    Page<Item> findByZipCodeLikeIgnoreCase(String searchKeyword, PageRequest pageRequest);
 }

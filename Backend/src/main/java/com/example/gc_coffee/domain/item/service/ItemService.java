@@ -52,7 +52,11 @@ public class ItemService {
 
         searchKeyword = "%" + searchKeyword + "%";
 
-        return itemRepository.findByItemNameLikeIgnoreCase(searchKeyword, pageRequest);
+        return switch (searchKeywordType) {
+            case "email" -> itemRepository.findByEmailLikeIgnoreCase(searchKeyword, pageRequest);
+            case "zipCode" -> itemRepository.findByZipCodeLikeIgnoreCase(searchKeyword, pageRequest);
+            default -> itemRepository.findByItemNameLikeIgnoreCase(searchKeyword, pageRequest);
+        };
     }
 
     public Optional<Item> findById(long itemId) {
