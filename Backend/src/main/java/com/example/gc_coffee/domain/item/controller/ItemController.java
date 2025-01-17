@@ -50,4 +50,5 @@ public class ItemController {
     public long itemCount() {
         return itemService.count();
     }
+
 }
