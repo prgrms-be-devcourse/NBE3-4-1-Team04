@@ -18,13 +18,14 @@ import java.util.Optional;
 public class ItemService {
     private final ItemRepository itemRepository;
 
-    public Item addItem(Category category, String itemName, int itemPrice, String itemImage, int quantity) {
+    public Item addItem(Category category, String itemName, int itemPrice, String itemImage, int quantity, String description) {
         Item item = Item.builder()
                 .category(category)
                 .itemName(itemName)
                 .itemPrice(itemPrice)
                 .itemImage(itemImage)
                 .quantity(quantity)
+                .itemDescription(description)
                 .build();
 
         return itemRepository.save(item);
@@ -38,7 +39,7 @@ public class ItemService {
         return itemRepository.findAllByOrderByIdDesc();
     }
 
-    // (조회) 전체 조회 및, 상품 이름
+    // (조회) Item 전체 조회 및, 상품 이름 검색
     public Page<Item> findByPaged(String searchKeyword, int page, int pageSize) {
         PageRequest pageRequest = PageRequest.of(page - 1, pageSize, Sort.by(Sort.Order.desc("id")));
 
@@ -51,5 +52,22 @@ public class ItemService {
 
     public Optional<Item> findById(long itemId) {
         return itemRepository.findById(itemId);
+    }
+
+    public void modify(Item item, Category category, String itemName, int itemPrice, String itemImage, int itemQuantity, String description) {
+        item.setCategory(category);
+        item.setItemName(itemName);
+        item.setItemPrice(itemPrice);
+        item.setItemImage(itemImage);
+        item.setQuantity(itemQuantity);
+        item.setItemDescription(description);
+    }
+
+    public void delete(Item item4) {
+        itemRepository.delete(item4);
+    }
+
+    public void flush() {
+        itemRepository.flush();
     }
 }
