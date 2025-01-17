@@ -115,7 +115,7 @@ public class ItemController {
     // 상품 삭제
     @DeleteMapping("/{item_id}")
     @Transactional
-    public ResponseEntity<String> modifyItem(@PathVariable long item_id) {
+    public ResponseEntity<String> deleteItem(@PathVariable long item_id) {
 
         Item item = itemService.findById(item_id).get();
 

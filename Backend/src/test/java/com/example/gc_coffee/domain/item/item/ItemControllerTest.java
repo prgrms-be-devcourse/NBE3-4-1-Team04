@@ -18,7 +18,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -154,24 +154,21 @@ public class ItemControllerTest {
     @Test
     @DisplayName("상품 삭제")
     void t5() throws Exception{
+        Item item = itemService.findById(4).get();
+        assertEquals("탄맛 쥬스",item.getItemName());
+
         ResultActions resultActions = mvc
                 .perform(
-                        get("/api/items/1/details")
+                        delete("/api/items/4")
                 )
                 .andDo(print());
 
-        Item item = itemService.findById(1).get();
-        assertEquals("탄맛 커피콩",item.getItemName());
-
         resultActions
                 .andExpect(handler().handlerType(ItemController.class))
-                .andExpect(handler().methodName("itemDetails"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(item.getId()))
-                .andExpect(jsonPath("$.category").value("COFFEE_BEAN"))
-                .andExpect(jsonPath("$.itemName").value("탄맛 커피콩"))
-                .andExpect(jsonPath("$.itemPrice").value(500))
-                .andExpect(jsonPath("$.quantity").value(10));
+                .andExpect(handler().methodName("deleteItem"))
+                .andExpect(status().isOk());
+
+        assertFalse(itemService.findById(4).isPresent());
 
     }
 }
