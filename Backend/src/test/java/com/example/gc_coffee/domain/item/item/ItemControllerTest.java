@@ -50,7 +50,7 @@ public class ItemControllerTest {
     }
 
     @Test
-    @DisplayName("유저, 상품 단건 조회")
+    @DisplayName("유저, 상품명 단건 조회")
     void t2() throws Exception{
         ResultActions resultActions = mvc
                 .perform(
@@ -73,6 +73,7 @@ public class ItemControllerTest {
                 .andExpect(jsonPath("$.items.itemDescription").doesNotExist());
 
     }
+
 
     @Test
     @DisplayName("유저, 상품 상세 조회") // t2()에서 단순 조회랑 나눠야 하면 활성화

@@ -22,13 +22,14 @@ public class BaseInitData {
     @Bean
     public ApplicationRunner BaseInitDataApplicationRunner() {
         return args -> {
-            self.itemSampleData1();
-            self.itemSampleData2();
+            self.itemSampleData();
+            self.cartSampleData();
+            self.orderTestSampleData();
         };
     }
 
     @Transactional
-    public void itemSampleData1() {
+    public void itemSampleData() {
         if (itemService.count() > 0) return ;
 
         itemService.addItem(Category.COFFEE_BEAN, "탄맛 커피콩", 500, "탄맛 커피콩 사진", 10);
@@ -39,7 +40,12 @@ public class BaseInitData {
     }
 
     @Transactional
-    public void itemSampleData2() {
+    public void cartSampleData() {
+        // todo: 장바구니 추가 API 구현 후 테스트_작업자:OS
+    }
 
+    @Transactional
+    public void orderTestSampleData() {
+        // todo: 주문 API 완료 후 진행_작업자:OS
     }
 }

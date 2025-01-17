@@ -44,7 +44,7 @@ public class ItemService {
         return itemRepository.findAll(pageRequest);
     }
 
-    // (조회) %상품명% 조회
+    // (조회) %상품, 이메일, 집코드% 조회
     public Page<Item> findByPaged(String searchKeywordType, String searchKeyword, int page, int pageSize) {
         PageRequest pageRequest = PageRequest.of(page - 1, pageSize, Sort.by(Sort.Order.desc("id")));
 
@@ -54,7 +54,7 @@ public class ItemService {
 
         return switch (searchKeywordType) {
             case "email" -> itemRepository.findByEmailLikeIgnoreCase(searchKeyword, pageRequest);
-            case "zipCode" -> itemRepository.findByZipCodeLikeIgnoreCase(searchKeyword, pageRequest);
+            case "zipcode" -> itemRepository.findByZipCodeLikeIgnoreCase(searchKeyword, pageRequest);
             default -> itemRepository.findByItemNameLikeIgnoreCase(searchKeyword, pageRequest);
         };
     }
