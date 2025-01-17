@@ -17,7 +17,7 @@ public class ItemController {
     private final ItemService itemService;
 
     @GetMapping
-    public ResponseEntity<PageDto<ItemDto>> orderItems(
+    public ResponseEntity<PageDto<ItemDto>> items(
             @RequestParam(defaultValue = "") String searchKeyword,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "4") int pageSize
