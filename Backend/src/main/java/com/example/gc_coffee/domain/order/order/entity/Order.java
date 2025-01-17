@@ -32,6 +32,7 @@ public class Order extends BaseEntity {
 
     private int orderNumber;
 
+    @Enumerated(value = EnumType.STRING)
     private OrderStatus orderStatus;
 
     @OneToMany(mappedBy = "order", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
