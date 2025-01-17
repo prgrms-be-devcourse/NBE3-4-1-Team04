@@ -7,6 +7,7 @@ import com.example.gc_coffee.domain.item.entity.Item;
 import com.example.gc_coffee.domain.item.service.ItemService;
 import com.example.gc_coffee.standard.dto.PageDto;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,11 +55,11 @@ public class ItemController {
 
     // 상품 등록 정보
     record ItemReqBody (
-            Category category,
-            String itemName,
-            int itemPrice,
+            @NotBlank Category category,
+            @NotBlank String itemName,
+            @NotBlank int itemPrice,
             String itemImage,
-            int itemQuantity,
+            @NotBlank int itemQuantity,
             String itemDescription
     ) {
     }
