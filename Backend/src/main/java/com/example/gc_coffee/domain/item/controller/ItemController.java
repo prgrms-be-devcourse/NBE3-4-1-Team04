@@ -89,13 +89,11 @@ public class ItemController {
     @PatchMapping("/{item_id}")
     @Transactional
     public ResponseEntity<ItemDescriptionDto> modifyItem(
-            @PathVariable long item_id,
+            @PathVariable("item_id") long itemId,
             @RequestBody ItemReqBody reqBody
     ) {
-        Item item = itemService.findById(item_id).get();
-
-        itemService.modify(
-                item,
+        Item item = itemService.modify(
+                itemId,
                 reqBody.category,
                 reqBody.itemName,
                 reqBody.itemPrice,
@@ -103,8 +101,6 @@ public class ItemController {
                 reqBody.itemQuantity,
                 reqBody.itemDescription
         );
-
-        itemService.flush();
 
         return ResponseEntity.ok()
                 .body(
@@ -115,15 +111,14 @@ public class ItemController {
     // 상품 삭제
     @DeleteMapping("/{item_id}")
     @Transactional
-    public ResponseEntity<String> deleteItem(@PathVariable long item_id) {
-
-        Item item = itemService.findById(item_id).get();
-
-        itemService.delete(item);
+    public ResponseEntity deleteItem(
+            @PathVariable("item_id") long itemId
+    ) {
+        itemService.delete(itemId);
 
         itemService.flush();
 
-        return ResponseEntity.ok("삭제가 완료되었습니다");
+        return ResponseEntity.ok("상품이 삭제되었습니다.");
     }
 
 

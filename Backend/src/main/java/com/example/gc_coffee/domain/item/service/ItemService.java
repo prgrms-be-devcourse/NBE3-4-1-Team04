@@ -3,6 +3,8 @@ package com.example.gc_coffee.domain.item.service;
 import com.example.gc_coffee.domain.item.entity.Category;
 import com.example.gc_coffee.domain.item.entity.Item;
 import com.example.gc_coffee.domain.item.repository.ItemRepository;
+import com.example.gc_coffee.global.exceptions.BusinessException;
+import com.example.gc_coffee.global.exceptions.constant.ErrorCode;
 import com.example.gc_coffee.global.util.Ut;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -54,7 +56,12 @@ public class ItemService {
         return itemRepository.findById(itemId);
     }
 
-    public void modify(Item item, Category category, String itemName, int itemPrice, String itemImage, int itemQuantity, String description) {
+
+
+    public Item modify(long itemId, Category category, String itemName, int itemPrice, String itemImage, int itemQuantity, String description) {
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_ITEM));
+
         item.setCategory(category);
         item.setItemName(itemName);
         item.setItemPrice(itemPrice);
@@ -62,10 +69,14 @@ public class ItemService {
         item.setQuantity(itemQuantity);
         item.setItemDescription(description);
 
-        itemRepository.save(item);
+        return itemRepository.save(item);
     }
 
-    public void delete(Item item) {
+    public void delete(long itemId) {
+
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_ITEM));
+
         itemRepository.delete(item);
     }
 
