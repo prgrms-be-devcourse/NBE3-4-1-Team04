@@ -39,3 +39,14 @@ out/
 ### Custom ###
 db_dev.mv.db
 db_dev.trace.db
+
+# .gitignore 파일에 추가
+frontend/.idea/
+frontend/my-app/
+frontend/src/pages/order/
+frontend/src/components/navigation/Navigation.js
+frontend/src/routes/Router.js
+.idea/frontend/.idea/
+frontend/my-app/
+frontend/src/pages/order/
+>>>>>>> Stashed changes

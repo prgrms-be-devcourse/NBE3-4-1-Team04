@@ -5,6 +5,7 @@ import com.example.gc_coffee.global.jpa.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
@@ -13,12 +14,13 @@ import java.util.List;
 
 @Entity
 @Table(name = "orders")
+@Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Order extends BaseEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // 기본 키 자동 생성
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "order_id")
     private Long id;
 
@@ -30,7 +32,7 @@ public class Order extends BaseEntity {
 
     private int orderPrice;
 
-    private int orderNumber;
+    private String orderNumber;
 
     @Enumerated(value = EnumType.STRING)
     private OrderStatus orderStatus;
@@ -38,4 +40,27 @@ public class Order extends BaseEntity {
     @OneToMany(mappedBy = "order", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
     @Builder.Default
     private List<OrderItem> orderItems = new ArrayList<>();
+
+    public void updateStatus(OrderStatus status) {
+        this.orderStatus = status;
+    }
+
+    public void cancel() {
+        this.orderStatus = OrderStatus.CANCELED;
+    }
+
+    public void setOrderPrice(int orderPrice) {
+        this.orderPrice = orderPrice;
+    }
+
+    public void calculateOrderPrice() {
+        this.orderPrice = orderItems.stream()
+                .mapToInt(item -> item.getPrice() * item.getQuantity())
+                .sum();
+    }
+
+    public void addOrderItem(OrderItem orderItem) {
+        orderItems.add(orderItem);
+        orderItem.setOrder(this);
+    }
 }
