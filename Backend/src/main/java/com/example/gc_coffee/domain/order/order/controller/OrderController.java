@@ -67,18 +67,18 @@ public class OrderController {
     }
 
     @Operation(summary = "주문 완료 상태 설정", description = "주문 완료 상태로 수정합니다.")
-    @PutMapping("/complete/{orderNumber}")
+    @PutMapping("/complete/{order_number}")
     public ResponseEntity<OrderResponse> updateOrderStatus(
-            @PathVariable("orderNumber") String orderNumber
+            @PathVariable("order_number") String orderNumber
     ) {
         OrderResponse order = orderService.updateOrderStatus(orderNumber);
         return ResponseEntity.ok(order);
     }
 
     @Operation(summary = "주문 취소", description = "주문을 취소합니다.")
-    @PutMapping("/cancel/{orderNumber}")
+    @PutMapping("/cancel/{order_number}")
     public ResponseEntity<OrderResponse> cancelOrder(
-            @PathVariable String orderNumber
+            @PathVariable("order_number") String orderNumber
     ) {
         OrderResponse order = orderService.cancelOrder(orderNumber);
         return ResponseEntity.ok().body(order);
