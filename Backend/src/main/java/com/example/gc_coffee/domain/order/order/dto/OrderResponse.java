@@ -15,7 +15,7 @@ public class OrderResponse {
     private String email;
     private String address;
     private int orderPrice;
-    private OrderStatus status;
+    private OrderStatus orderStatus;
 
     public static OrderResponse of(Order order) {
         return OrderResponse.builder()
@@ -24,7 +24,7 @@ public class OrderResponse {
                 .email(order.getEmail())
                 .address(order.getAddress())
                 .orderPrice(order.getOrderPrice())
-                .status(order.getOrderStatus())
+                .orderStatus(order.getOrderStatus())
                 .build();
     }
 } 

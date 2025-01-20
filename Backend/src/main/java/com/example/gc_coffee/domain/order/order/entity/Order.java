@@ -41,26 +41,29 @@ public class Order extends BaseEntity {
     @Builder.Default
     private List<OrderItem> orderItems = new ArrayList<>();
 
+    /**
+     * 연관관계 편의 메서드
+     */
+    public void addOrderItem(OrderItem orderItem) {
+        this.orderItems.add(orderItem);
+        orderItem.linkOrder(this);
+    }
+
+    /**
+     * 비즈니스 메서드
+     */
+
     public void updateStatus(OrderStatus status) {
         this.orderStatus = status;
     }
 
-    public void cancel() {
-        this.orderStatus = OrderStatus.CANCELED;
-    }
-
-    public void setOrderPrice(int orderPrice) {
-        this.orderPrice = orderPrice;
-    }
-
     public void calculateOrderPrice() {
         this.orderPrice = orderItems.stream()
-                .mapToInt(item -> item.getPrice() * item.getQuantity())
+                .mapToInt(item -> item.getPrice() * 1)//Todo 여기에 수량 적용해야함
                 .sum();
     }
 
-    public void addOrderItem(OrderItem orderItem) {
-        orderItems.add(orderItem);
-        orderItem.setOrder(this);
+    public void cancel() {
+        this.orderStatus = OrderStatus.CANCELED;
     }
 }
