@@ -56,7 +56,7 @@ public class OrderService {
 
             OrderItem orderItem = OrderItem.builder()
                     .item(item)
-                    .quantity(1)
+                    .quantity(1) //Todo 이후 아이템 수량 로직 수정 필요
                     .price(itemRequest.getItemPrice())
                     .build();
 
