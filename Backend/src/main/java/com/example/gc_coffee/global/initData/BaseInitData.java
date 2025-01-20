@@ -64,7 +64,7 @@ public class BaseInitData {
 
 
         OrderRequest order1 = OrderRequest.builder()
-                .email("user2@example.com")
+                .email("user1@example.com")
                 .address("서울시 서초구")
                 .items(
                         List.of(
@@ -88,7 +88,7 @@ public class BaseInitData {
         orderService.createOrder(order2);
 
         OrderRequest order3 = OrderRequest.builder()
-                .email("user2@example.com")
+                .email("user3@example.com")
                 .address("서울시 서초구")
                 .items(
                         List.of(

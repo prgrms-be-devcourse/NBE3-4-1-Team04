@@ -8,25 +8,32 @@ import com.example.gc_coffee.domain.order.order.entity.Order;
 import com.example.gc_coffee.domain.order.order.entity.OrderStatus;
 import com.example.gc_coffee.domain.order.order.repository.OrderRepository;
 import com.example.gc_coffee.domain.order.orderItem.entity.OrderItem;
+import com.example.gc_coffee.domain.order.orderItem.repository.OrderItemRepository;
 import com.example.gc_coffee.global.exceptions.BusinessException;
 import com.example.gc_coffee.global.exceptions.constant.ErrorCode;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional
 public class OrderService {
+
     private final OrderRepository orderRepository;
+    private final OrderItemRepository orderItemRepository;
     private final ItemService itemService;
 
-    @Transactional
+    public OrderService(OrderRepository orderRepository, OrderItemRepository orderItemRepository, ItemService itemService) {
+        this.orderRepository = orderRepository;
+        this.orderItemRepository = orderItemRepository;
+        this.itemService = itemService;
+    }
+
     public OrderResponse createOrder(OrderRequest orderRequest) {
         LocalDateTime now = LocalDateTime.now();
         String orderNumber = generateOrderNumber(now);
@@ -39,55 +46,72 @@ public class OrderService {
                 .orderStatus(OrderStatus.ORDERED)
                 .build();
 
-        orderRequest.getItems().forEach(item -> {
-            Item itemEntity = itemService.findById(item.getId())
+        orderRepository.save(order);
+
+        orderRepository.flush();
+
+        orderRequest.getItems().forEach(itemRequest -> {
+            Item item = itemService.findById(itemRequest.getId())
                     .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_ITEM));
 
             OrderItem orderItem = OrderItem.builder()
-                    .item(itemEntity)
-                    .quantity(item.getQuantity())
-                    .price(item.getItemPrice())
+                    .item(item)
+                    .quantity(1) //Todo 이후 아이템 수량 로직 수정 필요
+                    .price(itemRequest.getItemPrice())
                     .build();
+
             order.addOrderItem(orderItem);
         });
 
-        order.calculateOrderPrice(); // 전체 주문 금액 계산
+        orderItemRepository.saveAll(order.getOrderItems());
+
+        order.calculateOrderPrice();
+
         return OrderResponse.of(orderRepository.save(order));
     }
 
-    private String generateOrderNumber(LocalDateTime dateTime) {
-        // 날짜 형식: YYMMDD
-        String datePart = dateTime.format(DateTimeFormatter.ofPattern("yyMMdd"));
-        // UUID의 처음 6자리만 사용
-        String uniquePart = UUID.randomUUID().toString().substring(0, 6);
-        return datePart + uniquePart;
+    public OrderResponse getOrderById(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_ORDER));
+        return OrderResponse.of(order);
     }
 
-    @Transactional(readOnly = true)
-    public List<OrderResponse> findAllByEmail(String email) {
-        List<Order> orders = orderRepository.findAllByEmail(email);
+    public List<OrderResponse> getAllOrders() {
+        return orderRepository.findAll().stream()
+                .map(OrderResponse::of)
+                .collect(Collectors.toList());
+    }
 
-        if (orders.isEmpty()) {
+    public void deleteOrder(Long orderId) {
+        if (!orderRepository.existsById(orderId)) {
             throw new BusinessException(ErrorCode.NOT_FOUND_ORDER);
         }
 
-        return orders.stream()
-                .map(OrderResponse::of)
-                .toList();
+        orderItemRepository.deleteAllByOrderId(orderId);
+        orderRepository.deleteById(orderId);
     }
 
-    public OrderResponse findByOrderNumber(String orderNumber) {
+    public List<OrderResponse> findOrdersByEmail(String email) {
+        List<Order> orders = orderRepository.findAllByEmail(email);
+        if (orders.isEmpty()) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ORDER);
+        }
+        return orders.stream()
+                .map(OrderResponse::of)
+                .collect(Collectors.toList());
+    }
+
+    public OrderResponse findOrderByOrderNumber(String orderNumber) {
         Order order = orderRepository.findByOrderNumber(orderNumber)
-                .orElseThrow(() ->new BusinessException(ErrorCode.NOT_FOUND_ORDER));
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_ORDER));
         return OrderResponse.of(order);
     }
 
     @Transactional
-    public OrderResponse updateOrderStatus(String orderNumber, OrderStatus status) {
+    public OrderResponse updateOrderStatus(String orderNumber) {
         Order order = orderRepository.findByOrderNumber(orderNumber)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_ORDER));
-        order.updateStatus(status);
-
+        order.updateStatus(OrderStatus.COMPLETED);
         return OrderResponse.of(orderRepository.save(order));
     }
 
@@ -102,4 +126,14 @@ public class OrderService {
     public Long count() {
         return orderRepository.count();
     }
-} 
+
+    public Optional<Order> fineLatest() {
+        return orderRepository.findFirstByOrderByIdDesc();
+    }
+
+    private String generateOrderNumber(LocalDateTime dateTime) {
+        String datePart = dateTime.format(java.time.format.DateTimeFormatter.ofPattern("yyMMdd"));
+        String uniquePart = UUID.randomUUID().toString().substring(0, 6);
+        return "ORDER-" + datePart + uniquePart;
+    }
+}

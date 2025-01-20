@@ -16,12 +16,4 @@ public class OrderRequest {
     private String email;
     private String address;
     private List<ItemDto> items;
-
-    public static OrderRequest of(String email, String address, List<ItemDto> items) {
-        return OrderRequest.builder()
-                .email(email)
-                .address(address)
-                .items(items)
-                .build();
-    }
 }
