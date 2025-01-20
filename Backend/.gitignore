@@ -39,3 +39,4 @@ out/
 ### Custom ###
 db_dev.mv.db
 db_dev.trace.db.DS_Store
+.DS_Store
