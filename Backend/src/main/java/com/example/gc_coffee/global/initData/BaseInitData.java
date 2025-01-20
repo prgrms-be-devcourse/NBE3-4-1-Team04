@@ -101,6 +101,19 @@ public class BaseInitData {
                 .build();
         orderService.createOrder(order3);
 
+        OrderRequest order4 = OrderRequest.builder()
+                .email("user3@example.com")
+                .address("서울시 서초구")
+                .items(
+                        List.of(
+                                new ItemDto(item1),
+                                new ItemDto(item2),
+                                new ItemDto(item3),
+                                new ItemDto(item4)
+                        )
+                )
+                .build();
+        orderService.createOrder(order4);
     }
 
     @Transactional
