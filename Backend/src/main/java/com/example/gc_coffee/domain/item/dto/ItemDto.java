@@ -3,14 +3,13 @@ package com.example.gc_coffee.domain.item.dto;
 import com.example.gc_coffee.domain.item.entity.Category;
 import com.example.gc_coffee.domain.item.entity.Item;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-// Getter와 Setter가 있어야 테스트 코드에서 DTO에 값을 설정 가능
 @Getter
 @Setter
 @NoArgsConstructor

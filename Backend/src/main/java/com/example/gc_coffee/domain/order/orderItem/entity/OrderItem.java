@@ -6,16 +6,18 @@ import com.example.gc_coffee.global.jpa.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "order_item")
+@Table(name = "order_items")
+@Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderItem extends BaseEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // 기본 키 자동 생성
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "order_item_id")
     private Long id;
 
@@ -27,6 +29,13 @@ public class OrderItem extends BaseEntity {
     @JoinColumn(name = "item_id")
     private Item item;
 
-    @Column(name = "quantity")
     private int quantity;
-}
+    private int price;
+
+    /**
+     * 연관관계 편의 메서드
+     */
+    public void linkOrder(Order order) {
+        this.order = order;
+    }
+} 
