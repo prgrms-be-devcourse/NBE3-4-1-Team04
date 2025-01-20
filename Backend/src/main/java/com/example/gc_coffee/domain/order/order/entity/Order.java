@@ -59,7 +59,7 @@ public class Order extends BaseEntity {
 
     public void calculateOrderPrice() {
         this.orderPrice = orderItems.stream()
-                .mapToInt(item -> item.getPrice() * 1)//Todo 여기에 수량 적용 (변수를 받아서 적용)
+                .mapToInt(item -> item.getItem().getItemPrice() * 1)//Todo 여기에 수량 적용 (변수를 받아서 적용)
                 .sum();
     }
 

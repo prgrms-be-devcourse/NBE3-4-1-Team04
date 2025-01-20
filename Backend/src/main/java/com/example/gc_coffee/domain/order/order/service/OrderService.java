@@ -57,7 +57,6 @@ public class OrderService {
             OrderItem orderItem = OrderItem.builder()
                     .item(item)
                     .quantity(1) //Todo 이후 아이템 수량 로직 수정 필요
-                    .price(itemRequest.getItemPrice())
                     .build();
 
             order.addOrderItem(orderItem);
@@ -82,15 +81,6 @@ public class OrderService {
                 .collect(Collectors.toList());
     }
 
-    public void deleteOrder(Long orderId) {
-        if (!orderRepository.existsById(orderId)) {
-            throw new BusinessException(ErrorCode.NOT_FOUND_ORDER);
-        }
-
-        orderItemRepository.deleteAllByOrderId(orderId);
-        orderRepository.deleteById(orderId);
-    }
-
     public List<OrderResponse> findOrdersByEmail(String email) {
         List<Order> orders = orderRepository.findAllByEmail(email);
         if (orders.isEmpty()) {
@@ -105,6 +95,10 @@ public class OrderService {
         Order order = orderRepository.findByOrderNumber(orderNumber)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_ORDER));
         return OrderResponse.of(order);
+    }
+
+    public Long findOrderCountByEmail(String email){
+        return orderRepository.countByEmail(email);
     }
 
     @Transactional
