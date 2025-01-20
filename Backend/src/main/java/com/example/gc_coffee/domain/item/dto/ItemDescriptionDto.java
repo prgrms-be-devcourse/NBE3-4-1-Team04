@@ -15,6 +15,7 @@ public class ItemDescriptionDto {
     private String itemImage;
     private int quantity;
     private String itemDescription;
+    private boolean isDeleted;
 
     public ItemDescriptionDto(Item item) {
         this.id = item.getId();
@@ -24,5 +25,6 @@ public class ItemDescriptionDto {
         this.itemImage = item.getItemImage();
         this.quantity = item.getQuantity();
         this.itemDescription = item.getItemDescription();
+        this.isDeleted = item.isDeleted();
     }
 }

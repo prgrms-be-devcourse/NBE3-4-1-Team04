@@ -29,10 +29,20 @@ public class Item extends BaseEntity {
 
     private int quantity; // 상품 재고 수량
 
+    private boolean isDeleted; // 상품 삭제 여부
+
     // Todo: 별도 관리해야할지 고민
     private String itemDescription; // 상품 설명
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cart_id")
     private Cart cart; // 장바구니와의 관계
+
+    /**
+     * 비즈니스 메서드
+     */
+
+    public void removeItem(){
+        this.isDeleted = true;
+    }
 }
