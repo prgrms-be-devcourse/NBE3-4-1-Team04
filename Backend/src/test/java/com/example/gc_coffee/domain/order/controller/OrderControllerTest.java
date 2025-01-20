@@ -1,156 +1,186 @@
 package com.example.gc_coffee.domain.order.controller;
 
+import com.example.gc_coffee.domain.item.dto.ItemDto;
 import com.example.gc_coffee.domain.order.order.controller.OrderController;
 import com.example.gc_coffee.domain.order.order.dto.OrderRequest;
 import com.example.gc_coffee.domain.order.order.dto.OrderResponse;
-import com.example.gc_coffee.domain.order.order.entity.OrderStatus;
+import com.example.gc_coffee.domain.order.order.entity.Order;
 import com.example.gc_coffee.domain.order.order.service.OrderService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
-import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(
-    controllers = OrderController.class,
-    excludeFilters = {
-        @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {
-            JpaMetamodelMappingContext.class
-        })
-    }
-)
-@MockBean(JpaMetamodelMappingContext.class)
-class OrderControllerTest {
-    @Autowired
-    private MockMvc mockMvc;
+@SpringBootTest
+@ActiveProfiles("test")
+@AutoConfigureMockMvc
+@Transactional
+public class OrderControllerTest {
 
     @Autowired
-    private ObjectMapper objectMapper;
-
-    @MockBean
     private OrderService orderService;
 
-    @Test
-    @DisplayName("새로운 주문을 생성할 수 있다")
-    void createOrder() throws Exception {
-        // given
-        OrderRequest requestDto = createOrderRequestDto();
-        OrderResponse responseDto = createOrderResponseDto();
-        given(orderService.createOrder(any(OrderRequest.class)))
-                .willReturn(responseDto);
+    @Autowired
+    private MockMvc mvc;
 
-        // when & then
-        mockMvc.perform(post("/api/orders")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(requestDto)))
-                .andDo(print())
+    @Test
+    @DisplayName("초기 데이터 기반 주문 생성 테스트")
+    void createOrderWithSampleDataTest() throws Exception {
+        ResultActions resultActions = mvc.perform(
+                post("/api/orders")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                    "email": "user4@example.com",
+                                    "address": "서울시 강남구",
+                                    "items": [
+                                        {"id": 1, "quantity": 1, "itemPrice": 500},
+                                        {"id": 2, "quantity": 1, "itemPrice": 400}
+                                    ]
+                                }
+                                """)
+                        .contentType(
+                                new MediaType(MediaType.APPLICATION_JSON, StandardCharsets.UTF_8))
+        ).andDo(print());
+
+        Order order = orderService.fineLatest().get();
+
+        resultActions
+                .andExpect(handler().handlerType(OrderController.class))
+                .andExpect(handler().methodName("createOrder"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.orderNumber").value(responseDto.getOrderNumber()));
+                .andExpect(jsonPath("$.email").value("user4@example.com"))
+                .andExpect(jsonPath("$.address").value("서울시 강남구"))
+                .andExpect(jsonPath("$.orderPrice").value(900))
+                .andExpect(jsonPath("$.orderStatus").value("ORDERED"));
     }
 
     @Test
-    @DisplayName("이메일로 주문 목록을 조회할 수 있다")
-    void getOrdersByEmail() throws Exception {
-        // given
-        String email = "test@example.com";
-        OrderResponse responseDtos = createOrderResponseDto();
-        given(orderService.findByEmail(email))
-                .willReturn(responseDtos);
+    @DisplayName("전체 주문 조회 테스트")
+    void getAllOrdersTest() throws Exception {
+        // WHEN: 전체 주문 조회 요청
+        ResultActions resultActions = mvc.perform(
+                get("/api/orders/all")
+        ).andDo(print());
 
-        // when & then
-        mockMvc.perform(get("/api/orders/email/{email}", email))
-                .andDo(print())
+        // THEN: 응답 검증
+        resultActions
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].orderNumber").value(responseDtos.get(0).getOrderNumber()));
+                .andExpect(jsonPath("$.length()").value(3)); // 초기 데이터로 3개의 주문이 존재함
     }
 
     @Test
-    @DisplayName("주문 번호로 주문을 조회할 수 있다")
-    void getOrderByNumber() throws Exception {
-        // given
-        String orderNumber = "ORDER-001";
-        OrderResponse responseDto = createOrderResponseDto();
-        given(orderService.findByOrderNumber(orderNumber))
-                .willReturn(responseDto);
+    @DisplayName("초기 데이터 기반 주문 ID로 조회 테스트")
+    void getOrderByIdWithSampleDataTest() throws Exception {
+        ResultActions resultActions = mvc.perform(
+                get("/api/orders/id/1")
+        ).andDo(print());
 
-        // when & then
-        mockMvc.perform(get("/api/orders/{orderNumber}", orderNumber))
-                .andDo(print())
+        OrderResponse order = orderService.getOrderById(1L);
+
+        resultActions
+                .andExpect(handler().handlerType(OrderController.class))
+                .andExpect(handler().methodName("getOrdersById"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.orderNumber").value(orderNumber));
+                .andExpect(jsonPath("$.email").value(order.getEmail()))
+                .andExpect(jsonPath("$.address").value(order.getAddress()))
+                .andExpect(jsonPath("$.orderPrice").value(order.getOrderPrice()))
+                .andExpect(jsonPath("$.orderStatus").value(order.getOrderStatus().name()));
     }
 
     @Test
-    @DisplayName("주문 상태를 수정할 수 있다")
-    void updateOrderStatus() throws Exception {
-        // given
-        String orderNumber = "ORDER-001";
-        OrderStatus newStatus = OrderStatus.COMPLETED;
-        OrderResponse responseDto = createOrderResponseDto();
-        given(orderService.updateOrderStatus(orderNumber, newStatus))
-                .willReturn(responseDto);
-
-        // when & then
-        mockMvc.perform(put("/api/orders/{orderNumber}/status", orderNumber)
-                .param("status", newStatus.name()))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.orderNumber").value(orderNumber));
-    }
-
-    @Test
-    @DisplayName("주문을 취소할 수 있다")
-    void cancelOrder() throws Exception {
-        // given
-        String orderNumber = "ORDER-001";
-        OrderResponse responseDto = createOrderResponseDto();
-        given(orderService.cancelOrder(orderNumber))
-                .willReturn(responseDto);
-
-        // when & then
-        mockMvc.perform(put("/api/orders/{orderNumber}/cancel", orderNumber))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.orderNumber").value(orderNumber));
-    }
-
-    private OrderRequest createOrderRequestDto() {
-        return OrderRequest.builder()
-                .email("Grids&Circles@example.com")
-                .address("경상남도 거제시 00동")
-                .items(Arrays.asList(
-                        OrderRequest.builder()
-                                .itemId(1L)
-                                .quantity(2)
-                                .price(10000)
-                                .build()
+    @DisplayName("주문 번호로 조회 테스트")
+    void getOrderByOrderNumberWithSampleDataTest() throws Exception {
+        OrderResponse order = orderService.createOrder(OrderRequest.builder()
+                .email("test@example.com")
+                .address("테스트 주소")
+                .items(List.of(
+                        new ItemDto(1L, null, null, "item1", null, 5000, null, 1)
                 ))
-                .build();
+                .build());
+
+        String orderNumber = order.getOrderNumber(); // 생성된 주문 번호 가져오기
+
+        ResultActions resultActions = mvc.perform(
+                get("/api/orders/number/" + orderNumber)
+        ).andDo(print());
+
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.email").value(order.getEmail()))
+                .andExpect(jsonPath("$.address").value(order.getAddress()))
+                .andExpect(jsonPath("$.orderPrice").value(order.getOrderPrice()))
+                .andExpect(jsonPath("$.orderStatus").value(order.getOrderStatus().name()));
     }
 
-    private OrderResponse createOrderResponseDto() {
-        return OrderResponse.builder()
-                .id(1L)
-                .orderNumber("ORDER-001")
-                .email("Grids&Circles@example.com")
-                .address("경상남도 거제시 00동")
-                .orderPrice(20000)
-                .status(OrderStatus.ORDERED)
-                .build();
+
+
+    @Test
+    @DisplayName("초기 데이터 기반 모든 주문 조회 테스트")
+    void getAllOrdersWithSampleDataTest() throws Exception {
+        ResultActions resultActions = mvc.perform(
+                get("/api/orders/all")
+        ).andDo(print());
+
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(3)); // 초기 데이터로 3개의 주문이 존재
     }
-} 
+
+    @Test
+    @DisplayName("초기 데이터 기반 주문 취소 테스트")
+    void cancelOrderWithSampleDataTest() throws Exception {
+        // GIVEN: 데이터 초기화 및 주문 생성
+        OrderResponse order = orderService.createOrder(OrderRequest.builder()
+                .email("test@example.com")
+                .address("테스트 주소")
+                .items(List.of(
+                        new ItemDto(1L, null, null, "item1", null, 5000, null, 1)
+                ))
+                .build());
+
+        String orderNumber = order.getOrderNumber(); // 생성된 주문 번호 가져오기
+
+        ResultActions resultActions = mvc.perform(
+                put("/api/orders/cancel/" + orderNumber)
+        ).andDo(print());
+
+        resultActions
+                .andExpect(handler().handlerType(OrderController.class))
+                .andExpect(handler().methodName("cancelOrder"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.orderStatus").value("CANCELED"));
+
+        mvc.perform(get("/api/orders/number/" + orderNumber))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.orderStatus").value("CANCELED"));
+    }
+
+    @Test
+    @DisplayName("초기 데이터 기반 주문 삭제 테스트")
+    void deleteOrderWithSampleDataTest() throws Exception {
+        ResultActions resultActions = mvc.perform(
+                delete("/api/orders/1")
+        ).andDo(print());
+
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(content().string("주문이 삭제되었습니다."));
+
+        mvc.perform(get("/api/orders/1"))
+                .andExpect(status().isNotFound());
+    }
+}
