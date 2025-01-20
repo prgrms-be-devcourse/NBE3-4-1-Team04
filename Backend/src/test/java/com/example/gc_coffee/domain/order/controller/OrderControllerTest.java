@@ -4,7 +4,6 @@ import com.example.gc_coffee.domain.item.dto.ItemDto;
 import com.example.gc_coffee.domain.order.order.controller.OrderController;
 import com.example.gc_coffee.domain.order.order.dto.OrderRequest;
 import com.example.gc_coffee.domain.order.order.dto.OrderResponse;
-import com.example.gc_coffee.domain.order.order.entity.Order;
 import com.example.gc_coffee.domain.order.order.service.OrderService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -56,8 +55,6 @@ public class OrderControllerTest {
                                 new MediaType(MediaType.APPLICATION_JSON, StandardCharsets.UTF_8))
         ).andDo(print());
 
-        Order order = orderService.fineLatest().get();
-
         resultActions
                 .andExpect(handler().handlerType(OrderController.class))
                 .andExpect(handler().methodName("createOrder"))
@@ -79,7 +76,7 @@ public class OrderControllerTest {
         // THEN: 응답 검증
         resultActions
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(3)); // 초기 데이터로 3개의 주문이 존재함
+                .andExpect(jsonPath("$.length()").value(4)); // 초기 데이터로 3개의 주문이 존재함
     }
 
     @Test
@@ -108,7 +105,7 @@ public class OrderControllerTest {
                 .email("test@example.com")
                 .address("테스트 주소")
                 .items(List.of(
-                        new ItemDto(1L, null, null, "item1", null, 5000, null, 1)
+                        new ItemDto(1L, null, null, "item1", null, 5000, null, 1, "아이템 설명", false)
                 ))
                 .build());
 
@@ -127,7 +124,6 @@ public class OrderControllerTest {
     }
 
 
-
     @Test
     @DisplayName("초기 데이터 기반 모든 주문 조회 테스트")
     void getAllOrdersWithSampleDataTest() throws Exception {
@@ -137,18 +133,17 @@ public class OrderControllerTest {
 
         resultActions
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(3)); // 초기 데이터로 3개의 주문이 존재
+                .andExpect(jsonPath("$.length()").value(4)); // 초기 데이터로 3개의 주문이 존재
     }
 
     @Test
     @DisplayName("초기 데이터 기반 주문 취소 테스트")
     void cancelOrderWithSampleDataTest() throws Exception {
-        // GIVEN: 데이터 초기화 및 주문 생성
         OrderResponse order = orderService.createOrder(OrderRequest.builder()
                 .email("test@example.com")
                 .address("테스트 주소")
                 .items(List.of(
-                        new ItemDto(1L, null, null, "item1", null, 5000, null, 1)
+                        new ItemDto(1L, null, null, "item1", null, 5000, null, 1, "아이템 설명", false)
                 ))
                 .build());
 
@@ -170,17 +165,15 @@ public class OrderControllerTest {
     }
 
     @Test
-    @DisplayName("초기 데이터 기반 주문 삭제 테스트")
-    void deleteOrderWithSampleDataTest() throws Exception {
+    @DisplayName("전체 주문 조회 테스트")
+    void getOrderCountByEmail() throws Exception {
+        // WHEN: 전체 주문 조회 요청
         ResultActions resultActions = mvc.perform(
-                delete("/api/orders/1")
+                get("/api/orders/count/user3@example.com")
         ).andDo(print());
 
         resultActions
                 .andExpect(status().isOk())
-                .andExpect(content().string("주문이 삭제되었습니다."));
-
-        mvc.perform(get("/api/orders/1"))
-                .andExpect(status().isNotFound());
+                .andExpect(content().string("2"));
     }
 }

@@ -28,8 +28,7 @@ public class ItemDto {
     private String itemImage;  // 상품 이미지 URL
     private int quantity;      // 재고 수량
     private String itemDescription; // 상품 설명
-
-
+    private boolean isDeleted; // 상품 삭제
 
     public ItemDto(Item item) {
         this.id = item.getId();

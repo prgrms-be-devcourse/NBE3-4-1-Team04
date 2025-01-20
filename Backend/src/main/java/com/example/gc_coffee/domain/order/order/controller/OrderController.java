@@ -51,37 +51,36 @@ public class OrderController {
     }
 
     @Operation(summary = "주문 번호로 주문 조회", description = "주문 번호로 주문을 조회합니다.")
-    @GetMapping("/number/{orderNumber}")
+    @GetMapping("/number/{order_number}")
     public ResponseEntity<OrderResponse> getOrderByNumber(
-            @PathVariable String orderNumber
+            @PathVariable("order_number") String orderNumber
     ) {
         return ResponseEntity.ok().body(orderService.findOrderByOrderNumber(orderNumber));
     }
 
+    @Operation(summary = "이메일로 주문 개수 조회", description = "이메일로 주문 개수 조회합니다.")
+    @GetMapping("/count/{email}")
+    public ResponseEntity<Long> getOrderCountByEmail(
+            @PathVariable("email") String email
+    ) {
+        return ResponseEntity.ok().body(orderService.findOrderCountByEmail(email));
+    }
+
     @Operation(summary = "주문 완료 상태 설정", description = "주문 완료 상태로 수정합니다.")
-    @PutMapping("/complete/{orderNumber}")
+    @PutMapping("/complete/{order_number}")
     public ResponseEntity<OrderResponse> updateOrderStatus(
-            @PathVariable String orderNumber
+            @PathVariable("order_number") String orderNumber
     ) {
         OrderResponse order = orderService.updateOrderStatus(orderNumber);
         return ResponseEntity.ok(order);
     }
 
     @Operation(summary = "주문 취소", description = "주문을 취소합니다.")
-    @PutMapping("/cancel/{orderNumber}")
+    @PutMapping("/cancel/{order_number}")
     public ResponseEntity<OrderResponse> cancelOrder(
-            @PathVariable String orderNumber
+            @PathVariable("order_number") String orderNumber
     ) {
         OrderResponse order = orderService.cancelOrder(orderNumber);
         return ResponseEntity.ok().body(order);
-    }
-
-    @Operation(summary = "주문 삭제", description = "주문을 삭제합니다.")
-    @DeleteMapping("/{order_id}")
-    public ResponseEntity deleteOrder(
-            @PathVariable("order_id") Long orderId
-    ) {
-        orderService.deleteOrder(orderId);
-        return ResponseEntity.ok("주문이 삭제되었습니다.");
     }
 } 

@@ -108,21 +108,6 @@ public class ItemController {
                 );
     }
 
-    // 상품 삭제
-    @DeleteMapping("/{item_id}")
-    @Transactional
-    public ResponseEntity deleteItem(
-            @PathVariable("item_id") long itemId
-    ) {
-        itemService.delete(itemId);
-
-        itemService.flush();
-
-        return ResponseEntity.ok("상품이 삭제되었습니다.");
-    }
-
-
-
     // 상품 갯수
     @GetMapping("/count")
     public long itemCount() {

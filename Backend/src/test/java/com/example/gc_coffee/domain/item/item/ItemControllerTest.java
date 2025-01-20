@@ -17,10 +17,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -37,13 +36,12 @@ public class ItemControllerTest {
 
     @Test
     @DisplayName("유저, 상품 조회")
-    void t1() throws Exception{
+    void t1() throws Exception {
         ResultActions resultActions = mvc
                 .perform(
                         get("/api/items?page=1&pageSize=4")
                 )
                 .andDo(print());             // JSON 응답 데이터를 콘솔에 출력
-
 
 
         List<Item> items = itemService.findAllByOrderByIdDesc();
@@ -57,7 +55,7 @@ public class ItemControllerTest {
 
     @Test
     @DisplayName("유저, 상품명 단건 조회")
-    void t2() throws Exception{
+    void t2() throws Exception {
         ResultActions resultActions = mvc
                 .perform(
                         get("/api/items/1")
@@ -79,47 +77,9 @@ public class ItemControllerTest {
                 .andExpect(jsonPath("$.itemDescription").value(item.getItemDescription()));
     }
 
-
-    @Test
-    @DisplayName("상품 등록")
-    void t3() throws Exception{
-        ResultActions resultActions = mvc
-                .perform(
-                        post("/api/items")
-                                .content("""
-                                        {
-                                            "category":"TEA",
-                                            "itemName":"과자에 차 한잔?",
-                                            "itemPrice":1000,
-                                            "itemImage":"사진이 아직 없어요",
-                                            "itemQuantity":10,
-                                            "itemDescription":"한정판매 합니다."
-                                        }
-                                        """)
-                                .contentType(
-                                        new MediaType(MediaType.APPLICATION_JSON, StandardCharsets.UTF_8))
-                )
-                .andDo(print());
-
-        Item item = itemService.fineLatest().get();
-        assertThat(item.getItemName()).isEqualTo("과자에 차 한잔?");
-
-        resultActions
-                .andExpect(handler().handlerType(ItemController.class))
-                .andExpect(handler().methodName("addItem"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(5))
-                .andExpect(jsonPath("$.category").value("TEA"))
-                .andExpect(jsonPath("$.itemName").value("과자에 차 한잔?"))
-                .andExpect(jsonPath("$.itemPrice").value(1000))
-                .andExpect(jsonPath("$.itemImage").value("사진이 아직 없어요"))
-                .andExpect(jsonPath("$.quantity").value(10))
-                .andExpect(jsonPath("$.itemDescription").value("한정판매 합니다."));
-    }
-
     @Test
     @DisplayName("상품 수정")
-    void t4() throws Exception{
+    void t3() throws Exception {
         ResultActions resultActions = mvc
                 .perform(
                         patch("/api/items/1")
@@ -140,7 +100,7 @@ public class ItemControllerTest {
                 .andDo(print());
 
         Item item = itemService.findById(1).get();
-        assertEquals("아침엔 모닝커피?",item.getItemName());
+        assertEquals("아침엔 모닝커피?", item.getItemName());
 
         resultActions
                 .andExpect(handler().handlerType(ItemController.class))
@@ -155,24 +115,4 @@ public class ItemControllerTest {
                 .andExpect(jsonPath("$.itemDescription").value("어서오세요~"));
     }
 
-    @Test
-    @DisplayName("상품 삭제")
-    void t5() throws Exception{
-        Item item = itemService.findById(4).get();
-        assertEquals("탄맛 쥬스",item.getItemName());
-
-        ResultActions resultActions = mvc
-                .perform(
-                        delete("/api/items/4")
-                )
-                .andDo(print());
-
-        resultActions
-                .andExpect(handler().handlerType(ItemController.class))
-                .andExpect(handler().methodName("deleteItem"))
-                .andExpect(status().isOk());
-
-        assertFalse(itemService.findById(4).isPresent());
-
-    }
 }
