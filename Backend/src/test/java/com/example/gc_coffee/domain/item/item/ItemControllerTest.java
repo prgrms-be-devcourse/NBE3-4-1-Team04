@@ -68,11 +68,11 @@ public class ItemControllerTest {
                 .andExpect(handler().methodName("item"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(item.getId()))
-                .andExpect(jsonPath("$.category").value(item.getCategory()))
+                .andExpect(jsonPath("$.category").value(item.getCategory().name()))
                 .andExpect(jsonPath("$.itemName").value(item.getItemName()))
                 .andExpect(jsonPath("$.itemPrice").value(item.getItemPrice()))
                 .andExpect(jsonPath("$.quantity").value(item.getQuantity()))
-                .andExpect(jsonPath("$.items.itemDescription").value(item.getItemDescription()));
+                .andExpect(jsonPath("$.itemDescription").value(item.getItemDescription()));
     }
 
 

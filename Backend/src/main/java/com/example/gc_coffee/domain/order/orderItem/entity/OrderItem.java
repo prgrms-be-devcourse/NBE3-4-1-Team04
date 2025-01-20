@@ -4,18 +4,17 @@ import com.example.gc_coffee.domain.item.entity.Item;
 import com.example.gc_coffee.domain.order.order.entity.Order;
 import com.example.gc_coffee.global.jpa.entity.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "order_item")
-@Builder
+@Table(name = "order_items")
+@Getter
 @NoArgsConstructor
-@AllArgsConstructor
 public class OrderItem extends BaseEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // 기본 키 자동 생성
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "order_item_id")
     private Long id;
 
@@ -27,6 +26,17 @@ public class OrderItem extends BaseEntity {
     @JoinColumn(name = "item_id")
     private Item item;
 
-    @Column(name = "quantity")
     private int quantity;
-}
+    private int price;
+
+    @Builder
+    public OrderItem(Item item, int quantity, int price) {
+        this.item = item;
+        this.quantity = quantity;
+        this.price = price;
+    }
+
+    public void setOrder(Order order) {
+        this.order = order;
+    }
+} 
