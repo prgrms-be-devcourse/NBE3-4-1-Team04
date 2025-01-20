@@ -50,7 +50,7 @@ public class AdminControllerTest {
                 .andExpect(jsonPath("$.itemName").value("아메리카노"))
                 .andExpect(jsonPath("$.category").value("COFFEE"))
                 .andExpect(jsonPath("$.itemPrice").value(4500))
-                .andExpect(jsonPath("$.itemImage").value("http://example.com/image.png"))
+                .andExpect(jsonPath("$.itemImage").value("/image.png"))
                 .andExpect(jsonPath("$.quantity").value(100))
                 .andExpect(jsonPath("$.itemDescription").value("신선한 원두로 만든 커피"));
     }
