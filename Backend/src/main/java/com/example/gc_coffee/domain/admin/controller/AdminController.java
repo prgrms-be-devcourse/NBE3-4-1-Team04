@@ -8,10 +8,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.*;
 
 
 @RestController
@@ -51,6 +49,17 @@ public class AdminController {
         return ResponseEntity.ok(
                 new ItemDescriptionDto(item)
         );
+    }
+
+    // 상품 삭제
+    @PatchMapping("/{item_id}")
+    @Transactional
+    public ResponseEntity deleteItem(
+            @PathVariable("item_id") long itemId
+    ) {
+        adminService.deleteItem(itemId);
+
+        return ResponseEntity.ok("상품이 삭제되었습니다.");
     }
 }
 
