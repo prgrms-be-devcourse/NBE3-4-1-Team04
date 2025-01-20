@@ -20,6 +20,7 @@ import java.util.Optional;
 public class ItemService {
     private final ItemRepository itemRepository;
 
+    // 상품 등록
     public Item addItem(Category category, String itemName, int itemPrice, String itemImage, int quantity, String description) {
         Item item = Item.builder()
                 .category(category)
