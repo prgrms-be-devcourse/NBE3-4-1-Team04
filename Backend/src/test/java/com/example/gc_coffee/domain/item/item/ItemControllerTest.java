@@ -18,7 +18,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -41,7 +42,9 @@ public class ItemControllerTest {
                 .perform(
                         get("/api/items?page=1&pageSize=4")
                 )
-                .andDo(print());
+                .andDo(print());             // JSON 응답 데이터를 콘솔에 출력
+
+
 
         List<Item> items = itemService.findAllByOrderByIdDesc();
         assertEquals(4, items.size());
@@ -61,6 +64,7 @@ public class ItemControllerTest {
                 )
                 .andDo(print());
 
+
         Item item = itemService.findById(1).get();
 
         resultActions
@@ -68,11 +72,11 @@ public class ItemControllerTest {
                 .andExpect(handler().methodName("item"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(item.getId()))
-                .andExpect(jsonPath("$.category").value(item.getCategory()))
+                .andExpect(jsonPath("$.category").value(item.getCategory().name())) // Enum name()으로 비교
                 .andExpect(jsonPath("$.itemName").value(item.getItemName()))
                 .andExpect(jsonPath("$.itemPrice").value(item.getItemPrice()))
                 .andExpect(jsonPath("$.quantity").value(item.getQuantity()))
-                .andExpect(jsonPath("$.items.itemDescription").value(item.getItemDescription()));
+                .andExpect(jsonPath("$.itemDescription").value(item.getItemDescription()));
     }
 
 
