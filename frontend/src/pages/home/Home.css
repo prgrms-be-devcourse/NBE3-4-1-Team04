@@ -94,18 +94,35 @@
 }
 
 .add-button {
-    background: #5C8A3C;
+    background-color: #5C8A3C;
     color: white;
     border: none;
+    padding: 8px 16px;
     border-radius: 4px;
     cursor: pointer;
+    width: 64px;
+    height: 32px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
 }
 
 .soldout-button {
-    background: #212529;
-    color: white;
-    border: none;
+    background-color: #000 !important;
+    color: #fff !important;
+    border: none !important;
+    padding: 8px 16px;
     border-radius: 4px;
+    cursor: not-allowed;
+    width: 64px;
+    height: 32px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
 }
 
 /* Order Summary Styles */
@@ -172,7 +189,8 @@
 .action-buttons {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
+    padding: 15px;
 }
 
 .payment-button, .history-button {

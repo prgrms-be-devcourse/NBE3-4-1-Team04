@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import './Home.css';
-import Navigation from '../../components/navigation/Navigation';
-import Header from '../../components/header/Header';
-import { productService } from '../../services/productService';
 import { useNavigate } from 'react-router-dom';
-import Footer from '../../components/footer/Footer';
+import Header from '../../components/header/Header.jsx';
+import Navigation from '../../components/navigation/Navigation.jsx';
+import Footer from '../../components/footer/Footer.jsx';
+import { productService } from '../../services/productService';
+import './Home.css';
 
 const Home = () => {
     const [products, setProducts] = useState([]);
@@ -12,11 +12,20 @@ const Home = () => {
     const [orderItems, setOrderItems] = useState([]);
     const navigate = useNavigate();
 
+const navigateToAdmin = () => {
+        navigate('/administer'); // 관리자 페이지로 이동
+    };
+
     useEffect(() => {
         const fetchProducts = async () => {
             try {
+                // 임시 데이터로 Columbia Quindio를 품절 상태로 설정
                 const data = await productService.getAllProducts();
-                setProducts(data);
+                const updatedData = data.map(product => ({
+                    ...product,
+                    stock: product.name === "Columbia Quindio (400G)" ? 0 : product.stock
+                }));
+                setProducts(updatedData);
             } catch (error) {
                 console.error('상품 목록 로딩 실패:', error);
             } finally {
@@ -30,8 +39,8 @@ const Home = () => {
         setOrderItems(prev => {
             const existingItem = prev.find(item => item.id === product.id);
             if (existingItem) {
-                return prev.map(item => 
-                    item.id === product.id 
+                return prev.map(item =>
+                    item.id === product.id
                         ? { ...item, quantity: item.quantity + 1 }
                         : item
                 );
@@ -45,8 +54,8 @@ const Home = () => {
             const existingItem = prev.find(item => item.id === productId);
             if (existingItem.quantity > 1) {
                 // 수량이 1보다 크면 하나만 차감
-                return prev.map(item => 
-                    item.id === productId 
+                return prev.map(item =>
+                    item.id === productId
                         ? { ...item, quantity: item.quantity - 1 }
                         : item
                 );
@@ -66,12 +75,19 @@ const Home = () => {
             alert('주문할 상품을 선택해주세요.');
             return;
         }
-        // 주문 정보를 state로 전달
-        navigate('/payment', { 
-            state: { 
-                orderItems,
-                totalAmount: calculateTotal()
-            } 
+
+        const selectedItems = orderItems.map(item => ({
+            id: item.id,
+            name: item.name,
+            price: item.price,
+            quantity: item.quantity,
+            imageUrl: item.imageUrl
+        }));
+
+        console.log('전달되는 상품 데이터:', selectedItems); // 데이터 확인용
+
+        navigate('/payment', {
+            state: { selectedItems }
         });
     };
 
@@ -112,10 +128,16 @@ const Home = () => {
                                                 </div>
                                                 <div className="right-section">
                                                     <div className="price">₩{product.price.toLocaleString()}</div>
-                                                    <button 
+                                                    <button
                                                         className={product.stock > 0 ? 'add-button' : 'soldout-button'}
                                                         disabled={product.stock === 0}
                                                         onClick={() => addToOrder(product)}
+                                                        style={product.stock === 0 ? {
+                                                            backgroundColor: '#000',
+                                                            color: '#fff',
+                                                            border: 'none',
+                                                            cursor: 'not-allowed'
+                                                        } : {}}
                                                     >
                                                         {product.stock > 0 ? '추가' : 'SoldOut'}
                                                     </button>
@@ -127,8 +149,8 @@ const Home = () => {
                             )}
                         </div>
                         <div className="col-md-4">
-                            <div className="card" style={{ 
-                                position: 'sticky', 
+                            <div className="card" style={{
+                                position: 'sticky',
                                 top: '80px',
                                 zIndex: 100,
                                 marginTop: '20px'
@@ -142,8 +164,14 @@ const Home = () => {
                                             <span>{item.name}</span>
                                             <div className="d-flex align-items-center">
                                                 <span className="me-3">{item.quantity}개</span>
-                                                <button 
-                                                    className="btn btn-outline-danger btn-sm"
+                                                <button
+                                                    className="btn btn-sm"
+                                                    style={{
+                                                        backgroundColor: '#E86056',
+                                                        color: 'white',
+                                                        border: 'none',
+                                                        padding: '2px 8px'
+                                                    }}
                                                     onClick={() => removeFromOrder(item.id)}
                                                 >
                                                     취소
@@ -162,15 +190,27 @@ const Home = () => {
                             <div className="delivery-notice">
                                 • 당일 오후 2시 이후의 주문은 다음날 배송을 시작합니다.
                             </div>
-                            <div className="action-buttons">
-                                <button 
-                                    className="payment-button" 
+                            <div className="action-buttons" style={{ marginTop: '20px' }}>
+                                <button
+                                    className="btn w-100 mb-2"
+                                    style={{
+                                        backgroundColor: '#5C8A3C',
+                                        color: 'white',
+                                        border: 'none'
+                                    }}
                                     onClick={handlePayment}
-                                    disabled={orderItems.length === 0}
                                 >
                                     결제창으로 이동하기
                                 </button>
-                                <button className="history-button" onClick={() => navigate('/orders')}>
+                                <button
+                                    className="btn w-100"
+                                    style={{
+                                        backgroundColor: '#5C8A3C',
+                                        color: 'white',
+                                        border: 'none'
+                                    }}
+                                    onClick={() => navigate('/orders')}
+                                >
                                     주문내역 확인하기
                                 </button>
                             </div>
