@@ -37,10 +37,9 @@ public class OrderStatusUpdateBatchConfig {
     private final OrderRepository orderRepository;
     private final AsyncEmailService asyncEmailService;
 
-    //Todo Batch 테스팅
     @Bean
     public Job orderStatusUpdateJob(Step orderStatusUpdateStep) {
-        log.info("Order Status Update Job Started");
+        log.info("Order Status Update Job Initialized");
 
         return new JobBuilder("orderStatusUpdateJob", jobRepository)
                 .listener(jobExecutionListener())
@@ -63,12 +62,12 @@ public class OrderStatusUpdateBatchConfig {
         return new JobExecutionListener() {
             @Override
             public void beforeJob(JobExecution jobExecution) {
-                log.info("Job [{}] is starting...", jobExecution.getJobInstance().getJobName());
+                log.info("Job [{}] starting...", jobExecution.getJobInstance().getJobName());
             }
 
             @Override
             public void afterJob(JobExecution jobExecution) {
-                log.info("Job [{}] has completed with status: {}",
+                log.info("Job [{}] completed with status: {}",
                         jobExecution.getJobInstance().getJobName(),
                         jobExecution.getStatus());
             }
@@ -78,8 +77,22 @@ public class OrderStatusUpdateBatchConfig {
     @Bean
     @StepScope
     public RepositoryItemReader<Order> orderReader() {
-        LocalDateTime startTime = LocalDateTime.now().minusDays(1).withHour(14).withMinute(0).withSecond(0);
-        LocalDateTime endTime = LocalDateTime.now().withHour(14).withMinute(0).withSecond(0);
+        LocalDateTime now = LocalDateTime.now();
+
+        // 현재 시간이 오후 2시 기준으로 이전인지 이후인지에 따라 처리
+        LocalDateTime startTime;
+        LocalDateTime endTime;
+        if (now.getHour() >= 14) {
+            // 오후 2시 이후인 경우: 오늘 오후 2시 ~ 내일 오후 2시
+            startTime = now.withHour(14).withMinute(0).withSecond(0).withNano(0);
+            endTime = startTime.plusDays(1);
+        } else {
+            // 오후 2시 이전인 경우: 어제 오후 2시 ~ 오늘 오후 2시
+            endTime = now.withHour(14).withMinute(0).withSecond(0).withNano(0);
+            startTime = endTime.minusDays(1);
+        }
+
+        log.info("Reading orders between {} and {}", startTime, endTime);
 
         return new RepositoryItemReaderBuilder<Order>()
                 .name("orderReader")
@@ -91,10 +104,12 @@ public class OrderStatusUpdateBatchConfig {
                 .build();
     }
 
+
     @Bean
     public ItemProcessor<Order, Order> orderUpdateProcessor() {
         return order -> {
-            asyncEmailService.sendOrderConfirmation(order);
+            log.info("Processing order: {}", order.getOrderNumber());
+            asyncEmailService.sendOrderConfirmation(order); // 이메일 발송
             return order;
         };
     }
@@ -106,5 +121,4 @@ public class OrderStatusUpdateBatchConfig {
                 .methodName("save")
                 .build();
     }
-
 }

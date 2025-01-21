@@ -41,10 +41,8 @@ public class OrderService {
 
         Order order = existingOrderOpt
                 .map(existingOrder -> {
-                    // 기존 주문에 항목 추가 (병합 로직은 addOrderItem에서 처리)
-                    newOrderItems.forEach(existingOrder::addOrderItem);
-                    existingOrder.calculateOrderPrice();
-                    return existingOrder;
+                    // 기존 주문에 아이템 추가
+                    return addItemsToExistingOrder(existingOrder, newOrderItems);
                 })
                 .orElseGet(() -> {
                     // 새 주문 생성
@@ -55,6 +53,7 @@ public class OrderService {
 
         return OrderResponse.of(order);
     }
+
 
 
     //동일한 이메일의 주문 완료 이전인 주문을 조회

@@ -23,6 +23,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     long countByEmail(String email);
 
+
     //배치 처리
     @Query(value = "SELECT DISTINCT o FROM Order o " +
             "JOIN FETCH o.orderItems oi " +

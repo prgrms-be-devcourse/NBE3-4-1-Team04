@@ -44,7 +44,7 @@ public class ItemDescriptionDto {
 
     @Override
     public String toString() {
-        return String.format("ItemDescriptionDto{id=%d, itemName='%s', itemPrice=%d, quantity=%d, description='%s'}",
+        return String.format("Item{id=%d, itemName='%s', itemPrice=%d, quantity=%d, description='%s'}",
                 id, itemName, itemPrice, quantity, itemDescription);
     }
 }
