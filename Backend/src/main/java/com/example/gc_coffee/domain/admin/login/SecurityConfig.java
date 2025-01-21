@@ -24,8 +24,9 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // CSRF 비활성화 (필요에 따라 활성화 가능)
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/h2-console/**")
+                        .permitAll()
                         .requestMatchers("/admin/**", "/api/admin/**").hasRole("ADMIN") // "/admin/**" 경로는 ADMIN만 접근 가능
                         .anyRequest().permitAll() // 나머지 경로는 인증 없이 접근 가능
                 )
@@ -54,7 +55,16 @@ public class SecurityConfig {
                             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                             response.getWriter().write("Forbidden: " + accessDeniedException.getMessage());
                         })
-                );
+                )
+                .headers(
+                        headers ->
+                                headers.frameOptions(
+                                        frameOptions ->
+                                                frameOptions.sameOrigin() //h2콘솔
+                                )
+                )
+                .csrf(csrf -> csrf.disable()) // CSRF 비활성화 (필요에 따라 활성화 가능)
+        ;
 
         return http.build();
     }
