@@ -1,6 +1,8 @@
 package com.example.gc_coffee.domain.item.entity;
 
 import com.example.gc_coffee.domain.cart.entity.Cart;
+import com.example.gc_coffee.global.exceptions.BusinessException;
+import com.example.gc_coffee.global.exceptions.constant.ErrorCode;
 import com.example.gc_coffee.global.jpa.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -27,7 +29,7 @@ public class Item extends BaseEntity {
     @Enumerated(value = EnumType.STRING)
     private Category category; // 상품 카테고리
 
-    private int quantity; // 상품 재고 수량
+    private int stockQuantity; // 상품 재고 수량
 
     private boolean isDeleted; // 상품 삭제 여부
 
@@ -42,7 +44,27 @@ public class Item extends BaseEntity {
      * 비즈니스 메서드
      */
 
+    /**
+     * stock 증가
+     */
+    public void addStock(int quantity) {
+        this.stockQuantity += quantity;
+    }
+
+    /**
+     * stock 감소
+     */
+    public void removeStock(int quantity) {
+        int restStock = this.stockQuantity - quantity;
+        if(restStock < 0) {
+            throw  new BusinessException(ErrorCode.ITEM_SOLD_OUT);
+        }
+        this.stockQuantity = restStock;
+    }
+
     public void removeItem(){
         this.isDeleted = true;
     }
+
+
 }

@@ -91,7 +91,6 @@ const Orders = () => {
                                             </label>
                                         </div>
                                     </div>
-
                                     {searchType === 'orderNumber' ? (
                                         <div className="order-number-search p-4">
                                             <h4 className="mb-3">주문번호 조회</h4>

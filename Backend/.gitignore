@@ -44,3 +44,4 @@ db_dev.trace.db
 .DS_Store
 
 ### Yaml ###
+application-mail.yml

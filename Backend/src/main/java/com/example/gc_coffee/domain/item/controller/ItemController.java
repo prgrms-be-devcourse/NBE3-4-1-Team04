@@ -6,6 +6,7 @@ import com.example.gc_coffee.domain.item.entity.Category;
 import com.example.gc_coffee.domain.item.entity.Item;
 import com.example.gc_coffee.domain.item.service.ItemService;
 import com.example.gc_coffee.standard.dto.PageDto;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,22 @@ public class ItemController {
     private final ItemService itemService;
 
     // 전체 및 검색하여 조회
+    @Operation(summary = "상품 조회", description = "단일 상품을 조회합니다.")
+    @GetMapping("/{item_id}")
+    @Transactional(readOnly = true)
+    public ResponseEntity<ItemDescriptionDto> item(
+            @PathVariable long item_id
+    ) {
+        return ResponseEntity.ok()
+                .body(
+                        itemService.findById(item_id)
+                                .map(ItemDescriptionDto::new)
+                                .orElseThrow()
+                );
+
+    }
+
+    @Operation(summary = "상품 조회", description = "검색을 통해서 상품을 조회합니다.")
     @GetMapping
     @Transactional(readOnly = true)
     public ResponseEntity<PageDto<ItemDto>> items(
@@ -36,21 +53,7 @@ public class ItemController {
                 )
         );
     }
-
     // 단건 상세내용 조회 (클릭 시 보이는 화면)
-    @GetMapping("/{item_id}")
-    @Transactional(readOnly = true)
-    public ResponseEntity<ItemDescriptionDto> item(
-            @PathVariable long item_id
-    ) {
-        return ResponseEntity.ok()
-                .body(
-                        itemService.findById(item_id)
-                        .map(ItemDescriptionDto::new)
-                        .orElseThrow()
-                );
-
-    }
 
 
     // 상품 등록 정보
@@ -65,6 +68,7 @@ public class ItemController {
     }
 
     // 상품 등록
+    @Operation(summary = "상품 등록", description = "상품을 등록합니다.")
     @PostMapping
     public ResponseEntity<ItemDescriptionDto> addItem(
             @RequestBody ItemReqBody reqBody
@@ -86,6 +90,7 @@ public class ItemController {
     }
 
     // 상품 수정
+    @Operation(summary = "상품 수정", description = "상품을 수정합니다.")
     @PatchMapping("/{item_id}")
     @Transactional
     public ResponseEntity<ItemDescriptionDto> modifyItem(
@@ -109,6 +114,7 @@ public class ItemController {
     }
 
     // 상품 갯수
+    @Operation(summary = "상품 갯수", description = "상품 갯수를 조회합니다.")
     @GetMapping("/count")
     public long itemCount() {
         return itemService.count();

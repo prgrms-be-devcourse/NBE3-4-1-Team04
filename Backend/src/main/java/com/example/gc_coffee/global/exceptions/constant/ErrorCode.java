@@ -17,11 +17,13 @@ public enum ErrorCode {
 
     DUPLICATED_EMAIL(HttpStatus.CREATED, "이미 존재하는 이메일입니다."),
     DUPLICATED_ITEM(HttpStatus.CREATED, "이미 존재하는 상품입니다."),
+    COMPLETED_ORDER(HttpStatus.CREATED, "이미 배송 완료된 주문건입니다."),
+    ITEM_SOLD_OUT(HttpStatus.BAD_REQUEST, "재고가 부족합니다."),
+
 
     BAD_REQUEST(HttpStatus.BAD_REQUEST, "정상적인 요청이 아닙니다."),
     NO_ACCESS(HttpStatus.FORBIDDEN, "접근 권한이 없습니다."),
-    UNKNOWN(HttpStatus.INTERNAL_SERVER_ERROR, "알수없는 에러가 발생했습니다."),
-    ;
+    UNKNOWN(HttpStatus.INTERNAL_SERVER_ERROR, "알수없는 에러가 발생했습니다.");
 
     private final HttpStatus code;
     private final String message;
