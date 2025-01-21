@@ -94,6 +94,7 @@
 }
 
 .add-button {
+
     background-color: #5C8A3C;
     color: white;
     border: none;
@@ -123,6 +124,7 @@
     align-items: center;
     justify-content: center;
     text-align: center;
+
 }
 
 /* Order Summary Styles */
@@ -189,8 +191,10 @@
 .action-buttons {
     display: flex;
     flex-direction: column;
+
     gap: 10px;
     padding: 15px;
+
 }
 
 .payment-button, .history-button {
@@ -237,4 +241,23 @@
     flex: 0 0 33.333333%;
     max-width: 33.333333%;
     padding: 0 15px;
-} 
+
+}
+
+.admin-button {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    background-color: gray;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 14px;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.admin-button:hover {
+    background-color: black;
+}

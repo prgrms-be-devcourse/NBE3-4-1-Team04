@@ -1,6 +1,5 @@
 package com.example.gc_coffee.global.initData;
 
-import com.example.gc_coffee.domain.item.dto.ItemDto;
 import com.example.gc_coffee.domain.item.entity.Category;
 import com.example.gc_coffee.domain.item.entity.Item;
 import com.example.gc_coffee.domain.item.service.ItemService;
@@ -14,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.Map;
 
 @Configuration
 @RequiredArgsConstructor
@@ -36,8 +35,8 @@ public class BaseInitData {
 
     @Transactional
     public void itemSampleData() {
-        if (itemService.count() > 0) return;
-        if (orderService.count() > 0) return;
+        if (itemService.count() > 0 && orderService.count() > 0) return;
+
         Item item1 = itemService.addItem(
                 Category.COFFEE_BEAN,
                 "탄맛 커피콩", 500,
@@ -62,26 +61,27 @@ public class BaseInitData {
                 "탄맛 쥬스 사진", 10,
                 "하다하다 쥬스도 ㅋㅋ");
 
+        itemService.flush();
 
         OrderRequest order1 = OrderRequest.builder()
-                .email("user1@example.com")
-                .address("서울시 서초구")
+                .email("vkdnjdjxor@naver.com")
+                .address("수원시 장안구")
                 .items(
-                        List.of(
-                                new ItemDto(item1),
-                                new ItemDto(item2)
-                                )
+                        Map.of(
+                                item1.getId(), 1,
+                                item2.getId(), 2
                         )
+                )
                         .build();
         orderService.createOrder(order1);
 
         OrderRequest order2 = OrderRequest.builder()
-                .email("user2@example.com")
+                .email("vkdnjdjxor@naver.com")
                 .address("서울시 서초구")
                 .items(
-                        List.of(
-                                new ItemDto(item3),
-                                new ItemDto(item4)
+                        Map.of(
+                                item3.getId(), 1,
+                                item4.getId(), 2
                         )
                 )
                 .build();
@@ -91,11 +91,11 @@ public class BaseInitData {
                 .email("user3@example.com")
                 .address("서울시 서초구")
                 .items(
-                        List.of(
-                                new ItemDto(item1),
-                                new ItemDto(item2),
-                                new ItemDto(item3),
-                                new ItemDto(item4)
+                        Map.of(
+                                item1.getId(), 2,
+                                item2.getId(), 2,
+                                item3.getId(), 2,
+                                item4.getId(), 2
                         )
                 )
                 .build();
@@ -105,11 +105,11 @@ public class BaseInitData {
                 .email("user3@example.com")
                 .address("서울시 서초구")
                 .items(
-                        List.of(
-                                new ItemDto(item1),
-                                new ItemDto(item2),
-                                new ItemDto(item3),
-                                new ItemDto(item4)
+                        Map.of(
+                                item1.getId(), 2,
+                                item2.getId(), 2,
+                                item3.getId(), 2,
+                                item4.getId(), 2
                         )
                 )
                 .build();

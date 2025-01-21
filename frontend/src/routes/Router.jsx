@@ -7,6 +7,8 @@ const Payment = lazy(() => import('../pages/payment/Payment.jsx'));
 const Orders = lazy(() => import('../pages/orders/Orders.jsx'));
 const OrderList = lazy(() => import('../pages/orderlist/OrderList.jsx'));
 const Administer = lazy(() => import('../pages/administer/Administer.jsx'));
+const Dashboard = lazy(() => import('../pages/administer/Dashboard.jsx'));
+
 
 const routes = [
     {
@@ -29,6 +31,11 @@ const routes = [
         path: '/administer',
         element: <Administer />
     },
+    {
+        path: '/dashboard',
+        element: <Dashboard />,
+    },
+
     { path: "*", element: <Navigate to="/" /> }
 ];
 

@@ -12,8 +12,8 @@ const Home = () => {
     const [orderItems, setOrderItems] = useState([]);
     const navigate = useNavigate();
 
-const navigateToAdmin = () => {
-        navigate('/administer'); // 관리자 페이지로 이동
+    const navigateToAdmin = () => {
+        navigate('/administer');
     };
 
     useEffect(() => {
@@ -95,6 +95,23 @@ const navigateToAdmin = () => {
         <div className="app-container">
             <div className="content-wrapper">
                 <Header />
+                <button
+                    className="admin-button"
+                    onClick={navigateToAdmin}
+                    style={{
+                        position: 'absolute',
+                        top: '20px',
+                        right: '20px',
+                        padding: '8px 16px',
+                        backgroundColor: '#5C8A3C',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer'
+                    }}
+                >
+                    관리자 페이지
+                </button>
                 <Navigation />
                 <div className="container" style={{ marginTop: '-10px' }}>
                     <div className="row">
