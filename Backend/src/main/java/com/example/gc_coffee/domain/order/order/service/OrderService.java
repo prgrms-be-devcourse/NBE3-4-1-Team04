@@ -1,7 +1,7 @@
 package com.example.gc_coffee.domain.order.order.service;
 
 import com.example.gc_coffee.domain.item.entity.Item;
-import com.example.gc_coffee.domain.item.service.ItemService;
+import com.example.gc_coffee.domain.item.repository.ItemRepository;
 import com.example.gc_coffee.domain.order.order.dto.OrderRequest;
 import com.example.gc_coffee.domain.order.order.dto.OrderResponse;
 import com.example.gc_coffee.domain.order.order.entity.Order;
@@ -11,10 +11,12 @@ import com.example.gc_coffee.domain.order.orderItem.entity.OrderItem;
 import com.example.gc_coffee.domain.order.orderItem.repository.OrderItemRepository;
 import com.example.gc_coffee.global.exceptions.BusinessException;
 import com.example.gc_coffee.global.exceptions.constant.ErrorCode;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -22,51 +24,34 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class OrderService {
 
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
-    private final ItemService itemService;
+    private final ItemRepository itemRepository;
 
-    public OrderService(OrderRepository orderRepository, OrderItemRepository orderItemRepository, ItemService itemService) {
-        this.orderRepository = orderRepository;
-        this.orderItemRepository = orderItemRepository;
-        this.itemService = itemService;
-    }
 
     public OrderResponse createOrder(OrderRequest orderRequest) {
-        LocalDateTime now = LocalDateTime.now();
-        String orderNumber = generateOrderNumber(now);
+        // 주문 번호 생성
+        String orderNumber = generateOrderNumber(LocalDateTime.now());
 
-        Order order = Order.builder()
-                .email(orderRequest.getEmail())
-                .address(orderRequest.getAddress())
-                .orderTime(now)
-                .orderNumber(orderNumber)
-                .orderStatus(OrderStatus.ORDERED)
-                .build();
+        // OrderItem 리스트 생성
+        List<OrderItem> orderItemList = createOrderItems(orderRequest);
 
-        orderRepository.save(order);
+        Order order = Order.createOrder(
+                orderRequest.getEmail(),
+                orderRequest.getAddress(),
+                orderNumber,
+                orderItemList
+        );
 
-        orderRepository.flush();
-
-        orderRequest.getItems().forEach(itemRequest -> {
-            Item item = itemService.findById(itemRequest.getId())
-                    .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_ITEM));
-
-            OrderItem orderItem = OrderItem.builder()
-                    .item(item)
-                    .quantity(1) //Todo 이후 아이템 수량 로직 수정 필요
-                    .build();
-
-            order.addOrderItem(orderItem);
-        });
-
-        orderItemRepository.saveAll(order.getOrderItems());
-
+        // 총 주문 가격 계산
         order.calculateOrderPrice();
 
-        return OrderResponse.of(orderRepository.save(order));
+        saveOrderAndItems(order);
+
+        return OrderResponse.of(order);
     }
 
     public OrderResponse getOrderById(Long orderId) {
@@ -97,15 +82,21 @@ public class OrderService {
         return OrderResponse.of(order);
     }
 
-    public Long findOrderCountByEmail(String email){
+    public OrderResponse findOrderById(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_ORDER));
+        return OrderResponse.of(order);
+    }
+
+    public Long findOrderCountByEmail(String email) {
         return orderRepository.countByEmail(email);
     }
 
     @Transactional
-    public OrderResponse updateOrderStatus(String orderNumber) {
-        Order order = orderRepository.findByOrderNumber(orderNumber)
+    public OrderResponse modify(long orderId, OrderStatus orderStatus) {
+        Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_ORDER));
-        order.updateStatus(OrderStatus.COMPLETED);
+        order.setOrderStatus(orderStatus);
         return OrderResponse.of(orderRepository.save(order));
     }
 
@@ -121,13 +112,29 @@ public class OrderService {
         return orderRepository.count();
     }
 
+    //테스팅
     public Optional<Order> fineLatest() {
         return orderRepository.findFirstByOrderByIdDesc();
     }
 
+    private void saveOrderAndItems(Order order) {
+        orderRepository.save(order);
+        orderItemRepository.saveAll(order.getOrderItems());
+    }
+
+    private List<OrderItem> createOrderItems(OrderRequest orderRequest) {
+        List<OrderItem> orderItemList = new ArrayList<>();
+        orderRequest.getItems().forEach((itemId, count) -> {
+            Item item = itemRepository.findById(itemId)
+                    .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_ITEM));
+            orderItemList.add(OrderItem.createOrderItem(item, count));
+        });
+        return orderItemList;
+    }
+
     private String generateOrderNumber(LocalDateTime dateTime) {
         String datePart = dateTime.format(java.time.format.DateTimeFormatter.ofPattern("yyMMdd"));
-        String uniquePart = UUID.randomUUID().toString().substring(0, 6);
+        String uniquePart = UUID.randomUUID().toString().substring(0, 6).toUpperCase();
         return "ORDER-" + datePart + uniquePart;
     }
 }

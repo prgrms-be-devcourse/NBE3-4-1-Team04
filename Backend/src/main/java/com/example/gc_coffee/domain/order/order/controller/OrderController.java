@@ -2,6 +2,7 @@ package com.example.gc_coffee.domain.order.order.controller;
 
 import com.example.gc_coffee.domain.order.order.dto.OrderRequest;
 import com.example.gc_coffee.domain.order.order.dto.OrderResponse;
+import com.example.gc_coffee.domain.order.order.entity.OrderStatus;
 import com.example.gc_coffee.domain.order.order.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -36,12 +37,6 @@ public class OrderController {
         return ResponseEntity.ok().body(orderService.getOrderById(orderId));
     }
 
-    @Operation(summary = "전체 주문 조회", description = "이메일로 주문 목록을 조회합니다.")
-    @GetMapping("/all")
-    public ResponseEntity<List<OrderResponse>> getOrdersById() {
-        return ResponseEntity.ok().body(orderService.getAllOrders());
-    }
-
     @Operation(summary = "이메일로 주문 조회", description = "이메일로 주문 목록을 조회합니다.")
     @GetMapping("/{email}")
     public ResponseEntity<List<OrderResponse>> getOrdersByEmail(
@@ -66,12 +61,13 @@ public class OrderController {
         return ResponseEntity.ok().body(orderService.findOrderCountByEmail(email));
     }
 
-    @Operation(summary = "주문 완료 상태 설정", description = "주문 완료 상태로 수정합니다.")
-    @PutMapping("/complete/{order_number}")
+    @Operation(summary = "주문 상태 설정", description = "주문 상태를 수정합니다.")
+    @PutMapping("/status/{order_id}")
     public ResponseEntity<OrderResponse> updateOrderStatus(
-            @PathVariable("order_number") String orderNumber
-    ) {
-        OrderResponse order = orderService.updateOrderStatus(orderNumber);
+            @PathVariable("order_id") long orderId,
+            @RequestParam("order_status") OrderStatus orderStatus
+            ) {
+        OrderResponse order = orderService.modify(orderId, orderStatus);
         return ResponseEntity.ok(order);
     }
 

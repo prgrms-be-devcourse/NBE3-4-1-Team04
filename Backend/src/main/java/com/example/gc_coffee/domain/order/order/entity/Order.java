@@ -1,12 +1,11 @@
 package com.example.gc_coffee.domain.order.order.entity;
 
 import com.example.gc_coffee.domain.order.orderItem.entity.OrderItem;
+import com.example.gc_coffee.global.exceptions.BusinessException;
+import com.example.gc_coffee.global.exceptions.constant.ErrorCode;
 import com.example.gc_coffee.global.jpa.entity.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -15,6 +14,7 @@ import java.util.List;
 @Entity
 @Table(name = "orders")
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -28,7 +28,7 @@ public class Order extends BaseEntity {
 
     private String address;
 
-    private LocalDateTime orderTime;
+    private LocalDateTime orderDate;
 
     private int orderPrice;
 
@@ -37,9 +37,29 @@ public class Order extends BaseEntity {
     @Enumerated(value = EnumType.STRING)
     private OrderStatus orderStatus;
 
-    @OneToMany(mappedBy = "order", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<OrderItem> orderItems = new ArrayList<>();
+
+    /**
+     * 생성 메서드
+     */
+    // Order가 연관 관계를 세팅하고 상태랑 주문 시간까지 세팅 / 생성하는 시점에서 변경을 이 메서드에서만 하면된다
+    public static Order createOrder(String email, String address, String orderNumber, List<OrderItem> orderItems) {
+        Order order = new Order();
+        order.setEmail(email);
+        order.setAddress(address);
+        order.setOrderNumber(orderNumber);
+
+        for (OrderItem orderItem : orderItems) {
+            order.addOrderItem(orderItem);
+        }
+
+        order.setOrderStatus(OrderStatus.ORDERED); //상태
+        order.setOrderDate(LocalDateTime.now()); //현재 시간
+        return order;
+    }
+
 
     /**
      * 연관관계 편의 메서드
@@ -53,17 +73,24 @@ public class Order extends BaseEntity {
      * 비즈니스 메서드
      */
 
-    public void updateStatus(OrderStatus status) {
-        this.orderStatus = status;
+    public void cancel() {
+        if (orderStatus == OrderStatus.COMPLETED) {
+            throw new BusinessException(ErrorCode.COMPLETED_ORDER);
+        }
+        this.orderStatus = OrderStatus.CANCELED;
+        for (OrderItem orderItem : orderItems) {
+            orderItem.cancel(); // 주문된 제품에도 cancel을 각각 날려줌
+        }
+    }
+
+    public void orderComplete() {
+        this.orderStatus = OrderStatus.COMPLETED;
     }
 
     public void calculateOrderPrice() {
         this.orderPrice = orderItems.stream()
-                .mapToInt(item -> item.getItem().getItemPrice() * 1)//Todo 여기에 수량 적용 (변수를 받아서 적용)
+                .mapToInt(oi -> oi.getItem().getItemPrice() * oi.getCount())//Todo 여기에 수량 적용 (변수를 받아서 적용)
                 .sum();
     }
 
-    public void cancel() {
-        this.orderStatus = OrderStatus.CANCELED;
-    }
 }
