@@ -7,13 +7,13 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "order_items")
+@Table(name = "order_item")
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class OrderItems extends BaseEntity {
+public class OrderItem extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "order_item_id")
@@ -30,13 +30,13 @@ public class OrderItems extends BaseEntity {
     private int count;
 
     //==생성 메서드==//
-    public static OrderItems createOrderItem(Item item, int count) {
-        OrderItems orderItems = new OrderItems();
-        orderItems.setItem(item);
-        orderItems.setCount(count);
+    public static OrderItem createOrderItem(Item item, int count) {
+        OrderItem orderItem = new OrderItem();
+        orderItem.setItem(item);
+        orderItem.setCount(count);
 
         item.removeStock(count);
-        return orderItems;
+        return orderItem;
     }
 
     //==비즈니스 로직==//
