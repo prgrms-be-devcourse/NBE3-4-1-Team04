@@ -29,6 +29,7 @@ public class ItemService {
                 .itemImage(itemImage)
                 .quantity(quantity)
                 .itemDescription(description)
+                .isDeleted(false)
                 .build();
 
         return itemRepository.save(item);
@@ -39,24 +40,25 @@ public class ItemService {
     }
 
     public List<Item> findAllByOrderByIdDesc() {
-        return itemRepository.findAllByOrderByIdDesc();
+        return itemRepository.findAllByIsDeletedFalseOrderByIdDesc();
     }
 
     // (조회) Item 전체 조회 및, 상품 이름 검색
     public Page<Item> findByPaged(String searchKeyword, int page, int pageSize) {
         PageRequest pageRequest = PageRequest.of(page - 1, pageSize, Sort.by(Sort.Order.desc("id")));
 
-        if (Ut.str.isBlank(searchKeyword)) { return itemRepository.findAll(pageRequest); }
+        if (Ut.str.isBlank(searchKeyword)) {
+            return itemRepository.findAll(pageRequest);
+        }
 
         searchKeyword = "%" + searchKeyword + "%";
 
-        return itemRepository.findByItemNameLikeIgnoreCase(searchKeyword, pageRequest);
+        return itemRepository.findByItemNameLikeIgnoreCaseAndIsDeletedFalse(searchKeyword, pageRequest);
     }
 
     public Optional<Item> findById(long itemId) {
         return itemRepository.findById(itemId);
     }
-
 
 
     public Item modify(long itemId, Category category, String itemName, int itemPrice, String itemImage, int itemQuantity, String description) {
@@ -74,11 +76,10 @@ public class ItemService {
     }
 
     public void delete(long itemId) {
-
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_ITEM));
 
-        itemRepository.delete(item);
+        item.removeItem();
     }
 
     public void flush() {

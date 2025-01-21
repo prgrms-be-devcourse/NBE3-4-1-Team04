@@ -30,7 +30,6 @@ public class OrderItem extends BaseEntity {
     private Item item;
 
     private int quantity;
-    private int price;
 
     /**
      * 연관관계 편의 메서드

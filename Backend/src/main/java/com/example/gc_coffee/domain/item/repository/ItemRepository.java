@@ -9,9 +9,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ItemRepository extends JpaRepository<Item, Long> {
-    List<Item> findAllByOrderByIdDesc();
+    List<Item> findAllByIsDeletedFalseOrderByIdDesc();
 
-    Page<Item> findByItemNameLikeIgnoreCase(String searchKeyword, PageRequest pageRequest);
+    Page<Item> findByItemNameLikeIgnoreCaseAndIsDeletedFalse(String searchKeyword, PageRequest pageRequest);
 
     Optional<Item> findFirstByOrderByIdDesc();
 }
