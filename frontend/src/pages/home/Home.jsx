@@ -4,22 +4,18 @@ import Header from '../../components/header/Header.jsx';
 import Navigation from '../../components/navigation/Navigation.jsx';
 import Footer from '../../components/footer/Footer.jsx';
 import { productService } from '../../services/productService';
+import useLocalStorage from '../../components/localstorage/LocalStorage';
 import './Home.css';
 
 const Home = () => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [orderItems, setOrderItems] = useState([]);
+    const [orderItems, setOrderItems] = useLocalStorage('orderItems', []);
     const navigate = useNavigate();
-
-    const navigateToAdmin = () => {
-        navigate('/administer');
-    };
 
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                // 임시 데이터로 Columbia Quindio를 품절 상태로 설정
                 const data = await productService.getAllProducts();
                 const updatedData = data.map(product => ({
                     ...product,
@@ -53,16 +49,13 @@ const Home = () => {
         setOrderItems(prev => {
             const existingItem = prev.find(item => item.id === productId);
             if (existingItem.quantity > 1) {
-                // 수량이 1보다 크면 하나만 차감
                 return prev.map(item =>
                     item.id === productId
                         ? { ...item, quantity: item.quantity - 1 }
                         : item
                 );
-            } else {
-                // 수량이 1이면 완전히 제거
-                return prev.filter(item => item.id !== productId);
             }
+            return prev.filter(item => item.id !== productId);
         });
     };
 
@@ -84,7 +77,7 @@ const Home = () => {
             imageUrl: item.imageUrl
         }));
 
-        console.log('전달되는 상품 데이터:', selectedItems); // 데이터 확인용
+        console.log('전달되는 상품 데이터:', selectedItems);
 
         navigate('/payment', {
             state: { selectedItems }
@@ -97,7 +90,7 @@ const Home = () => {
                 <Header />
                 <button
                     className="admin-button"
-                    onClick={navigateToAdmin}
+                    onClick={() => navigate('/administer')}
                     style={{
                         position: 'absolute',
                         top: '20px',
@@ -134,7 +127,7 @@ const Home = () => {
                                                             alt={product.name}
                                                             onError={(e) => {
                                                                 e.target.onerror = null;
-                                                                e.target.src = '/images/coffee-bag.png';  // 기본 이미지
+                                                                e.target.src = '/images/coffee-bag.png';
                                                             }}
                                                         />
                                                     </div>

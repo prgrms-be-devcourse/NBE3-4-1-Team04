@@ -7,6 +7,7 @@ import ProductList from './ProductList';
 import TotalPrice from './TotalPrice';
 import PaymentButton from './PaymentButton';
 import PaymentConfirmation from './modal/PaymentConfirmation';
+import useLocalStorage from "../../components/localstorage/LocalStorage";
 
 const Payment = () => {
     const location = useLocation();
@@ -16,6 +17,7 @@ const Payment = () => {
     const [showModal, setShowModal] = useState(false);
     const [email, setEmail] = useState('');
     const [address, setAddress] = useState('');
+    const [orderItems, setOrderItems, clearOrderItems] = useLocalStorage('orderItems', []);
 
     useEffect(() => {
         if (!location.state?.selectedItems) {
@@ -34,6 +36,7 @@ const Payment = () => {
     };
 
     const handleConfirmPayment = () => {
+        clearOrderItems();
         setShowModal(false);
         alert('결제가 완료되었습니다.');
         navigate('/');
@@ -195,4 +198,4 @@ const Payment = () => {
     );
 };
 
-export default Payment; 
+export default Payment;
