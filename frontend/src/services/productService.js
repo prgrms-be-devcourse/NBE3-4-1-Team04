@@ -3,6 +3,22 @@ const API_BASE_URL = '/api';
 const products = [
     {
         id: 1,
+        name: "Columbia Quindio (400G)",
+        imageUrl: "/images/coffee-4.png",
+        price: 18000,
+        pricePerGram: 4500,
+        stock: 100
+    },
+    {
+        id: 2,
+        name: "Ethiopia Sidamo (400G)",
+        imageUrl: "/images/coffee-3.png",
+        price: 22000,
+        pricePerGram: 5500,
+        stock: 100
+    },
+    {
+        id: 3,
         name: 'Columbia Narino (400G)',
         imageUrl: '/images/coffee-1.png',
         price: 20000,
@@ -11,30 +27,12 @@ const products = [
         weight: '400G'
     },
     {
-        id: 2,
+        id: 4,
         name: 'Brazil Serra Do Caparao (400G)',
         imageUrl: '/images/coffee-2.png',
         price: 16000,
         pricePerGram: 4000,
         stock: 15,
-        weight: '400G'
-    },
-    {
-        id: 3,
-        name: 'Ethiopia Sidamo (400G)',
-        imageUrl: '/images/coffee-3.png',
-        price: 18000,
-        pricePerGram: 4500,
-        stock: 8,
-        weight: '400G'
-    },
-    {
-        id: 4,
-        name: 'Columbia Quindio (400G)',
-        imageUrl: '/images/coffee-4.png',
-        price: 22000,
-        pricePerGram: 5500,
-        stock: 0,
         weight: '400G'
     }
 ];
