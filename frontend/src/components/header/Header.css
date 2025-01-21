@@ -1,0 +1,17 @@
+.display-4 {
+    font-family: serif;
+    letter-spacing: -0.5px;
+    margin-bottom: 0;  /* 하단 마진 제거 */
+    font-size: 2.5rem;  /* 글자 크기 조정 */
+}
+
+.header {
+    padding: 80px 0 30px;  /* 상하 패딩 증가 */
+    margin-bottom: 0;
+}
+
+.navigation {
+    margin-top: -65px;  /* 더 위로 당김 */
+    padding: 3px 0;
+    border-bottom: 1px solid #eee;
+} 

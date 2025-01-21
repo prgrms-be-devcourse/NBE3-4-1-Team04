@@ -1,0 +1,26 @@
+.app-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;  /* 최소 높이를 뷰포트 높이로 설정 */
+}
+
+.content-wrapper {
+    flex: 1;
+    padding-bottom: 60px;  /* Footer 높이만큼 여백 추가 */
+}
+
+footer {
+    background-color: #343a40;
+    padding: 20px 0;
+    width: 100%;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+}
+
+footer p {
+    color: white;
+    text-align: center;
+    margin: 0;
+    font-size: 14px;
+} 
