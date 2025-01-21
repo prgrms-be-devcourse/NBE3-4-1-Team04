@@ -1,4 +1,4 @@
-package com.example.gc_coffee.domain.admin.config;
+package com.example.gc_coffee.domain.admin.login;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
@@ -9,5 +9,7 @@ public class AdminPasswordEncoder {
         String encodedPassword = encoder.encode(rawPassword);
 
         System.out.println("암호화된 비밀번호: " + encodedPassword);
+
+
     }
 }

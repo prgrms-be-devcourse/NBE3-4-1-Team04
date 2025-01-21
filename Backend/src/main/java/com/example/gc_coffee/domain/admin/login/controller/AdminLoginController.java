@@ -1,4 +1,4 @@
-package com.example.gc_coffee.domain.admin.config.controller;
+package com.example.gc_coffee.domain.admin.login.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -8,7 +8,7 @@ public class AdminLoginController {
 
     @GetMapping("/admin/login")
     public String loginPage() {
-        return "admin/login"; // 로그인 페이지 경로
+        return "admin/login"; // 로그인 페이지 경로 login.html 템플릿 반환
     }
 
     @GetMapping("/admin/dashboard")
