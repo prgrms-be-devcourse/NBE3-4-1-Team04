@@ -25,9 +25,9 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/admin/**", "/api/admin/**").hasRole("ADMIN") // "/admin/**" 경로는 ADMIN만 접근 가능
                         .requestMatchers("/h2-console/**")
                         .permitAll()
-                        .requestMatchers("/admin/**", "/api/admin/**").hasRole("ADMIN") // "/admin/**" 경로는 ADMIN만 접근 가능
                         .anyRequest().permitAll() // 나머지 경로는 인증 없이 접근 가능
                 )
                 .formLogin(form -> form
