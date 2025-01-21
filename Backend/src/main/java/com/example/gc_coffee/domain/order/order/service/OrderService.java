@@ -1,7 +1,7 @@
 package com.example.gc_coffee.domain.order.order.service;
 
 import com.example.gc_coffee.domain.item.entity.Item;
-import com.example.gc_coffee.domain.item.service.ItemService;
+import com.example.gc_coffee.domain.item.repository.ItemRepository;
 import com.example.gc_coffee.domain.order.order.dto.OrderRequest;
 import com.example.gc_coffee.domain.order.order.dto.OrderResponse;
 import com.example.gc_coffee.domain.order.order.entity.Order;
@@ -11,62 +11,122 @@ import com.example.gc_coffee.domain.order.orderItem.entity.OrderItem;
 import com.example.gc_coffee.domain.order.orderItem.repository.OrderItemRepository;
 import com.example.gc_coffee.global.exceptions.BusinessException;
 import com.example.gc_coffee.global.exceptions.constant.ErrorCode;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class OrderService {
 
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
-    private final ItemService itemService;
+    private final ItemRepository itemRepository;
 
-    public OrderService(OrderRepository orderRepository, OrderItemRepository orderItemRepository, ItemService itemService) {
-        this.orderRepository = orderRepository;
-        this.orderItemRepository = orderItemRepository;
-        this.itemService = itemService;
-    }
 
     public OrderResponse createOrder(OrderRequest orderRequest) {
-        LocalDateTime now = LocalDateTime.now();
-        String orderNumber = generateOrderNumber(now);
+        // 동일 이메일로 ORDERED 상태의 주문이 있는지 확인
+        Optional<Order> existingOrderOpt = findExistingOrder(orderRequest.getEmail());
 
-        Order order = Order.builder()
-                .email(orderRequest.getEmail())
-                .address(orderRequest.getAddress())
-                .orderTime(now)
-                .orderNumber(orderNumber)
-                .orderStatus(OrderStatus.ORDERED)
-                .build();
+        // 새로운 OrderItem 리스트 생성
+        List<OrderItem> newOrderItems = createOrderItems(orderRequest);
 
-        orderRepository.save(order);
+        Order order = existingOrderOpt
+                .map(existingOrder -> {
+                    // 기존 주문에 아이템 추가
+                    return addItemsToExistingOrder(existingOrder, newOrderItems);
+                })
+                .orElseGet(() -> {
+                    // 새 주문 생성
+                    return createNewOrder(orderRequest, newOrderItems);
+                });
 
-        orderRepository.flush();
+        saveOrderAndItems(order);
 
-        orderRequest.getItems().forEach(itemRequest -> {
-            Item item = itemService.findById(itemRequest.getId())
-                    .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_ITEM));
+        return OrderResponse.of(order);
+    }
 
-            OrderItem orderItem = OrderItem.builder()
-                    .item(item)
-                    .quantity(1) //Todo 이후 아이템 수량 로직 수정 필요
-                    .build();
 
-            order.addOrderItem(orderItem);
+
+    //동일한 이메일의 주문 완료 이전인 주문을 조회
+    private Optional<Order> findExistingOrder(String email) {
+        return orderRepository.findAllByEmail(email).stream()
+                .filter(order -> order.getOrderStatus() == OrderStatus.ORDERED)
+                .findFirst();
+    }
+
+    //이미 존재하는 주문에 아이템 추가
+    private Order addItemsToExistingOrder(Order existingOrder, List<OrderItem> orderItemList) {
+        orderItemList.forEach(existingOrder::addOrderItem);
+        existingOrder.calculateOrderPrice();
+        return existingOrder;
+    }
+
+    //새로운 주문
+    private Order createNewOrder(OrderRequest orderRequest, List<OrderItem> orderItemList) {
+        String orderNumber = generateOrderNumber(LocalDateTime.now()); //주문 번호
+
+        Order order = Order.createOrder(
+                orderRequest.getEmail(),
+                orderRequest.getAddress(),
+                orderNumber,
+                orderItemList
+        );
+
+        order.calculateOrderPrice(); // 총 가격 계산
+        return order;
+    }
+
+    public OrderResponse modify(Long orderId, String address, Map<Long, Integer> newItemList) {
+        // 주문 조회
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_ORDER));
+
+        // 상태 확인
+        if (order.getOrderStatus() != OrderStatus.ORDERED) {
+            throw new BusinessException(ErrorCode.COMPLETED_ORDER);
+        }
+
+        // 주소 변경
+        if (address != null && !address.isEmpty()) {
+            order.setAddress(address);
+        }
+
+        // 기존 아이템 제거 및 재고 복구 (명시적으로 제거 목록 처리)
+        List<OrderItem> itemsToRemove = new ArrayList<>(order.getOrderItems());
+        for (OrderItem orderItem : itemsToRemove) {
+            orderItem.getItem().addStock(orderItem.getCount());
+            orderItem.unlinkOrder();
+        }
+        order.getOrderItems().clear();
+
+        // 새로운 아이템으로 초기화
+        newItemList.forEach((itemId, count) -> {
+            if (count > 0) {
+                Item item = itemRepository.findById(itemId)
+                        .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_ITEM));
+                item.removeStock(count);
+
+                OrderItem newOrderItem = new OrderItem();
+                newOrderItem.setItem(item);
+                newOrderItem.setCount(count);
+                order.addOrderItem(newOrderItem);
+            }
         });
 
-        orderItemRepository.saveAll(order.getOrderItems());
-
+        // 주문 총 가격 다시 계산
         order.calculateOrderPrice();
 
-        return OrderResponse.of(orderRepository.save(order));
+        // 변경사항 저장
+        orderRepository.save(order);
+
+        // 응답 생성 및 반환
+        return OrderResponse.of(order);
     }
 
     public OrderResponse getOrderById(Long orderId) {
@@ -97,15 +157,21 @@ public class OrderService {
         return OrderResponse.of(order);
     }
 
-    public Long findOrderCountByEmail(String email){
+    public OrderResponse findOrderById(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_ORDER));
+        return OrderResponse.of(order);
+    }
+
+    public Long findOrderCountByEmail(String email) {
         return orderRepository.countByEmail(email);
     }
 
     @Transactional
-    public OrderResponse updateOrderStatus(String orderNumber) {
-        Order order = orderRepository.findByOrderNumber(orderNumber)
+    public OrderResponse updateOrderStatus(long orderId, OrderStatus orderStatus) {
+        Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_ORDER));
-        order.updateStatus(OrderStatus.COMPLETED);
+        order.setOrderStatus(orderStatus);
         return OrderResponse.of(orderRepository.save(order));
     }
 
@@ -121,13 +187,33 @@ public class OrderService {
         return orderRepository.count();
     }
 
+    //테스팅
     public Optional<Order> fineLatest() {
         return orderRepository.findFirstByOrderByIdDesc();
     }
 
+    private void saveOrderAndItems(Order order) {
+        orderRepository.save(order);
+        orderItemRepository.saveAll(order.getOrderItems());
+    }
+
+    private List<OrderItem> createOrderItems(OrderRequest orderRequest) {
+        List<OrderItem> orderItemList = new ArrayList<>();
+        orderRequest.getItems().forEach((itemId, count) -> {
+            Item item = itemRepository.findById(itemId)
+                    .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_ITEM));
+            orderItemList.add(OrderItem.createOrderItem(item, count));
+        });
+        return orderItemList;
+    }
+
     private String generateOrderNumber(LocalDateTime dateTime) {
         String datePart = dateTime.format(java.time.format.DateTimeFormatter.ofPattern("yyMMdd"));
-        String uniquePart = UUID.randomUUID().toString().substring(0, 6);
+        String uniquePart = UUID.randomUUID().toString().substring(0, 6).toUpperCase();
         return "ORDER-" + datePart + uniquePart;
+    }
+
+    public void flush() {
+        orderRepository.flush();
     }
 }

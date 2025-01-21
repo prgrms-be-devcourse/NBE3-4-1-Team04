@@ -27,7 +27,7 @@ public class ItemService {
                 .itemName(itemName)
                 .itemPrice(itemPrice)
                 .itemImage(itemImage)
-                .quantity(quantity)
+                .stockQuantity(quantity)
                 .itemDescription(description)
                 .isDeleted(false)
                 .build();
@@ -69,7 +69,7 @@ public class ItemService {
         item.setItemName(itemName);
         item.setItemPrice(itemPrice);
         item.setItemImage(itemImage);
-        item.setQuantity(itemQuantity);
+        item.setStockQuantity(itemQuantity);
         item.setItemDescription(description);
 
         return itemRepository.save(item);
