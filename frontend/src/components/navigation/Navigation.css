@@ -1,0 +1,40 @@
+.nav-link {
+    color: #5C8A3C;
+    text-decoration: none;
+    cursor: pointer;
+    font-weight: inherit;
+    font-size: inherit;
+    display: inline;
+}
+
+.nav-link:hover {
+    text-decoration: underline;
+}
+
+.nav-separator {
+    margin: 0 8px;
+    color: #666;
+    display: inline;
+}
+
+.h4 {
+    font-size: 1.5rem;
+    line-height: 1.2;
+    margin: 0;
+    font-weight: normal;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.border-bottom {
+    border-bottom: 1px solid #dee2e6;
+    position: relative;
+    z-index: 1000;
+    background-color: white;
+}
+
+.container.py-3 {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+} 

@@ -1,14 +1,15 @@
 import React, { Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
-import AppRoutes from './routes/Router';
+import routes from './routes/Router.jsx';
+import './App.css';
 
-function App() {
+const App = () => {
     return (
         <Suspense fallback={<div>Loading...</div>}>
             <Routes>
-                {AppRoutes.map((route, index) => (
+                {routes.map((route) => (
                     <Route
-                        key={index}
+                        key={route.path}
                         path={route.path}
                         element={route.element}
                     />
@@ -16,6 +17,6 @@ function App() {
             </Routes>
         </Suspense>
     );
-}
+};
 
 export default App;

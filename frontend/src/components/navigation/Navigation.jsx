@@ -1,47 +1,54 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
+import './Navigation.css';
 
 const Navigation = () => {
-    return (<nav className="navbar navbar-expand-lg navbar-light bg-light">
-        <div className="container px-4 px-lg-5">
-            <Link className="navbar-brand" to="/">Grids & Circles</Link>
-            <button className="navbar-toggler" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation">
-                    <span className="navbar-toggler-icon"></span>
-            </button>
-            <div className="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul className="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
-                    <li className="nav-item">
-                        <Link className="nav-link active" aria-current="page" to="/">Home</Link>
-                    </li>
-                    <li className="nav-item">
-                        <Link className="nav-link" to="/products">상품목록</Link>
-                    </li>
-                    <li className="nav-item">
-                        <Link className="nav-link" to="/orders">주문내역 확인</Link>
-                    </li>
-                    <li className="nav-item dropdown"><a className="nav-link dropdown-toggle" id="navbarDropdown"
-                                                         href="#" role="button" data-bs-toggle="dropdown"
-                                                         aria-expanded="false">Shop</a>
-                        <ul className="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <li><a className="dropdown-item" href="#!">All Products</a></li>
-                            <li>
-                                <hr className="dropdown-divider"/>
-                            </li>
-                            <li><a className="dropdown-item" href="#!">Popular Items</a></li>
-                            <li><a className="dropdown-item" href="#!">New Arrivals</a></li>
-                        </ul>
-                    </li>
-                </ul>
-                <form className="d-flex">
-                    <button className="btn btn-outline-dark" type="submit"><i
-                        className="bi-cart-fill me-1"></i> Cart <span
-                        className="badge bg-dark text-white ms-1 rounded-pill">0</span></button>
-                </form>
+    const location = useLocation();
+
+    const getNavigationText = () => {
+        switch (location.pathname) {
+            case '/':
+                return '상품목록';
+            case '/payment':
+                return (
+                    <>
+                        <Link to="/" className="nav-link">상품목록</Link>
+                        <span className="nav-separator">&gt;</span>
+                        <span>결제하기</span>
+                    </>
+                );
+            case '/orders':
+                return (
+                    <>
+                        <Link to="/" className="nav-link">상품목록</Link>
+                        <span className="nav-separator">&gt;</span>
+                        <span>주문내역 조회</span>
+                    </>
+                );
+            case '/orderlist':
+                return (
+                    <>
+                        <Link to="/" className="nav-link">상품목록</Link>
+                        <span className="nav-separator">&gt;</span>
+                        <Link to="/orders" className="nav-link">주문내역 조회</Link>
+                        <span className="nav-separator">&gt;</span>
+                        <span>조회결과</span>
+                    </>
+                );
+            case '/administer':
+                return '관리자';
+            default:
+                return '상품목록';
+        }
+    };
+
+    return (
+        <div className="border-bottom">
+            <div className="container py-3">
+                <h2 className="h4 mb-0">{getNavigationText()}</h2>
             </div>
         </div>
-    </nav>);
+    );
 };
 
 export default Navigation;
