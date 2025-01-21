@@ -29,6 +29,9 @@
 
 .border-bottom {
     border-bottom: 1px solid #dee2e6;
+    position: relative;
+    z-index: 1000;
+    background-color: white;
 }
 
 .container.py-3 {

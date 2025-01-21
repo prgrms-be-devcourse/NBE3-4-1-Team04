@@ -127,45 +127,52 @@ const Home = () => {
                             )}
                         </div>
                         <div className="col-md-4">
-                            <div className="order-summary">
-                                <h5>Order summary</h5>
-                                {orderItems.map((item) => (
-                                    <div key={item.id} className="order-item">
-                                        <div className="order-item-content">
-                                            <div className="item-info">
-                                                <span className="item-name">{item.name}</span>
-                                                <span className="item-quantity">{item.quantity}ea</span>
+                            <div className="card" style={{ 
+                                position: 'sticky', 
+                                top: '80px',
+                                zIndex: 100,
+                                marginTop: '20px'
+                            }}>
+                                <div className="card-header">
+                                    <h5 className="mb-0">Order Summary</h5>
+                                </div>
+                                <div className="card-body" style={{ maxHeight: 'calc(100vh - 300px)', overflowY: 'auto' }}>
+                                    {orderItems.map(item => (
+                                        <div key={item.id} className="d-flex justify-content-between align-items-center mb-2">
+                                            <span>{item.name}</span>
+                                            <div className="d-flex align-items-center">
+                                                <span className="me-3">{item.quantity}개</span>
+                                                <button 
+                                                    className="btn btn-outline-danger btn-sm"
+                                                    onClick={() => removeFromOrder(item.id)}
+                                                >
+                                                    취소
+                                                </button>
                                             </div>
-                                            <button 
-                                                className="cancel-button"
-                                                onClick={() => removeFromOrder(item.id)}
-                                            >
-                                                취소
-                                            </button>
                                         </div>
-                                    </div>
-                                ))}
-                                <div className="total-section">
-                                    <div className="total-row">
-                                        <span>총액(VAT포함)</span>
-                                        <span className="total-amount">₩{calculateTotal().toLocaleString()}</span>
-                                    </div>
+                                    ))}
                                 </div>
-                                <div className="delivery-notice">
-                                    • 당일 오후 2시 이후의 주문은 다음날 배송을 시작합니다.
+                            </div>
+                            <div className="total-section">
+                                <div className="total-row">
+                                    <span>총액(VAT포함)</span>
+                                    <span className="total-amount">₩{calculateTotal().toLocaleString()}</span>
                                 </div>
-                                <div className="action-buttons">
-                                    <button 
-                                        className="payment-button" 
-                                        onClick={handlePayment}
-                                        disabled={orderItems.length === 0}
-                                    >
-                                        결제창으로 이동하기
-                                    </button>
-                                    <button className="history-button" onClick={() => navigate('/orders')}>
-                                        주문내역 확인하기
-                                    </button>
-                                </div>
+                            </div>
+                            <div className="delivery-notice">
+                                • 당일 오후 2시 이후의 주문은 다음날 배송을 시작합니다.
+                            </div>
+                            <div className="action-buttons">
+                                <button 
+                                    className="payment-button" 
+                                    onClick={handlePayment}
+                                    disabled={orderItems.length === 0}
+                                >
+                                    결제창으로 이동하기
+                                </button>
+                                <button className="history-button" onClick={() => navigate('/orders')}>
+                                    주문내역 확인하기
+                                </button>
                             </div>
                         </div>
                     </div>
