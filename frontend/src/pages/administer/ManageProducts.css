@@ -1,0 +1,150 @@
+/* ManageProducts.css */
+.manage-products-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: 'Arial', sans-serif; /* 프로젝트에서 사용 중인 폰트로 통일 */
+}
+
+.page-title, .section-title {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+    font-family: 'Arial', sans-serif;
+}
+
+.add-product-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 30px;
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    font-family: 'Arial', sans-serif;
+}
+
+.add-product-form input, .add-product-form textarea {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+    font-family: 'Arial', sans-serif;
+}
+
+.add-product-form button {
+    padding: 15px 20px;
+    background-color: #34495e;
+    color: #ecf0f1;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s;
+    font-family: 'Arial', sans-serif;
+}
+
+.add-product-form button:hover {
+    background-color: #1abc9c;
+}
+
+.product-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    font-family: 'Arial', sans-serif;
+}
+
+.product-item {
+    display: flex;
+    flex-direction: column;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    font-family: 'Arial', sans-serif;
+}
+
+.product-item img {
+    max-width: 100%;
+    border-radius: 10px;
+}
+
+.product-item .actions {
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-around;
+    font-family: 'Arial', sans-serif;
+}
+
+.product-item .actions button {
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    background-color: #34495e;
+    color: #ecf0f1;
+    transition: background-color 0.3s ease;
+    font-family: 'Arial', sans-serif;
+}
+
+.product-item .actions button:first-child:hover {
+    background-color: #1abc9c;
+}
+
+.product-item .actions button:last-child {
+    background-color: #e74c3c;
+    color: #fff;
+    font-family: 'Arial', sans-serif;
+}
+
+.product-item .actions button:last-child:hover {
+    background-color: #c0392b;
+}
+
+.edit-product-form {
+    margin-top: 20px;
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    font-family: 'Arial', sans-serif;
+}
+
+.edit-product-form input, .edit-product-form textarea {
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-family: 'Arial', sans-serif;
+}
+
+.edit-product-form button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    margin-right: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #34495e;
+    color: #ecf0f1;
+    transition: background-color 0.3s ease;
+    font-family: 'Arial', sans-serif;
+}
+
+.edit-product-form button:hover {
+    background-color: #1abc9c;
+}
+
+.edit-product-form button:last-child {
+    background-color: #e74c3c;
+    font-family: 'Arial', sans-serif;
+}
+
+.edit-product-form button:last-child:hover {
+    background-color: #c0392b;
+}

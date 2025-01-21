@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
+import useLocalStorage from '../../components/localstorage/LocalStorage';
 
 const ProductList = ({ initialItems, setTotalItems, setTotalPrice }) => {
-    const [items, setItems] = useState(initialItems);
+    const [items, setItems] = useLocalStorage('orderItems', initialItems);
 
     useEffect(() => {
         const totalQty = items.reduce((sum, item) => sum + item.quantity, 0);
@@ -12,20 +13,18 @@ const ProductList = ({ initialItems, setTotalItems, setTotalPrice }) => {
 
     const handleRemoveItem = (id) => {
         if (window.confirm('선택하신 상품을 취소하시겠습니까?')) {
-            setItems(prevItems => {
-                const item = prevItems.find(item => item.id === id);
-                if (item.quantity > 1) {
-                    // 수량이 1보다 크면 하나만 감소
-                    return prevItems.map(item =>
-                        item.id === id
-                            ? { ...item, quantity: item.quantity - 1 }
-                            : item
-                    );
-                } else {
-                    // 수량이 1이면 완전히 제거
-                    return prevItems.filter(item => item.id !== id);
-                }
-            });
+            setItems((prevItems) =>
+                prevItems.reduce((result, item) => {
+                    if (item.id === id) {
+                        if (item.quantity > 1) {
+                            result.push({ ...item, quantity: item.quantity - 1 });
+                        }
+                    } else {
+                        result.push(item);
+                    }
+                    return result;
+                }, [])
+            );
         }
     };
 
