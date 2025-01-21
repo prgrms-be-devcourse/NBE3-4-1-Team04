@@ -19,7 +19,6 @@ public class OrderStatusUpdateSchedule {
     private final JobLauncher jobLauncher;
     private final JobRegistry jobRegistry;
 
-//    @Scheduled(cron = "*/30 * * * * ?", zone = "Asia/Seoul") // 30초마다 실행 (테스팅용)
     @Scheduled(cron = "0 0 14 * * ?", zone = "Asia/Seoul") // 매일 오후 2시에 실행
     public void runBatchJob() throws Exception {
         log.info("Order update schedule started");
@@ -27,15 +26,25 @@ public class OrderStatusUpdateSchedule {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
         LocalDateTime now = LocalDateTime.now();
 
-        // 오후 2시 기준으로 시간 설정
-        LocalDateTime startTime, endTime;
-        if (now.getHour() >= 14) {
-            startTime = now.withHour(14).withMinute(0).withSecond(0);
+        /**
+         * 테스팅을 위해서 배치 시간 설정
+         */
+        LocalDateTime startTime;
+        LocalDateTime endTime;
+        if (now.getHour() > 14) {
+            // 오후 2시 이후인 경우: 오늘 오후 2시 ~ 내일 오후 2시
+            startTime = now.withHour(14).withMinute(0).withSecond(0).withNano(0);
             endTime = startTime.plusDays(1);
         } else {
-            endTime = now.withHour(14).withMinute(0).withSecond(0);
+            // 오후 2시 이전인 경우: 어제 오후 2시 ~ 오늘 오후 2시
+            endTime = now.withHour(14).withMinute(0).withSecond(0).withNano(0);
             startTime = endTime.minusDays(1);
         }
+        /**
+         * 오후 두시 배치 시간 설정(실제 코드)
+         */
+        // startTime = LocalDateTime.now().minusDays(1).withHour(14).withMinute(0).withSecond(0);
+        // endTime = LocalDateTime.now().withHour(14).withMinute(0).withSecond(0);
 
         // 고유한 JobParameters 추가 (현재 시간을 포함)
         JobParameters jobParameters = new JobParametersBuilder()

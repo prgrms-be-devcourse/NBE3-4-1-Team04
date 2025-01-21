@@ -79,10 +79,12 @@ public class OrderStatusUpdateBatchConfig {
     public RepositoryItemReader<Order> orderReader() {
         LocalDateTime now = LocalDateTime.now();
 
-        // 현재 시간이 오후 2시 기준으로 이전인지 이후인지에 따라 처리
+        /**
+         * 테스팅을 위해서 배치 시간 설정
+         */
         LocalDateTime startTime;
         LocalDateTime endTime;
-        if (now.getHour() >= 14) {
+        if (now.getHour() > 14) {
             // 오후 2시 이후인 경우: 오늘 오후 2시 ~ 내일 오후 2시
             startTime = now.withHour(14).withMinute(0).withSecond(0).withNano(0);
             endTime = startTime.plusDays(1);
@@ -91,6 +93,11 @@ public class OrderStatusUpdateBatchConfig {
             endTime = now.withHour(14).withMinute(0).withSecond(0).withNano(0);
             startTime = endTime.minusDays(1);
         }
+        /**
+         * 오후 두시 배치 시간 설정
+         */
+        // startTime = LocalDateTime.now().minusDays(1).withHour(14).withMinute(0).withSecond(0);
+        // endTime = LocalDateTime.now().withHour(14).withMinute(0).withSecond(0);
 
         log.info("Reading orders between {} and {}", startTime, endTime);
 
