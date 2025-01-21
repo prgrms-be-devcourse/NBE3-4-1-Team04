@@ -87,6 +87,11 @@ public class OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_ORDER));
 
+        // 상태 확인
+        if (order.getOrderStatus() != OrderStatus.ORDERED) {
+            throw new BusinessException(ErrorCode.COMPLETED_ORDER);
+        }
+
         // 주소 변경
         if (address != null && !address.isEmpty()) {
             order.setAddress(address);
