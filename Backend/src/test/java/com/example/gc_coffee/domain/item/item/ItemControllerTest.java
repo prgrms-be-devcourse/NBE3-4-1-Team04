@@ -73,7 +73,7 @@ public class ItemControllerTest {
                 .andExpect(jsonPath("$.category").value(item.getCategory().name())) // Enum name()으로 비교
                 .andExpect(jsonPath("$.itemName").value(item.getItemName()))
                 .andExpect(jsonPath("$.itemPrice").value(item.getItemPrice()))
-                .andExpect(jsonPath("$.quantity").value(item.getQuantity()))
+                .andExpect(jsonPath("$.quantity").value(item.getStockQuantity()))
                 .andExpect(jsonPath("$.itemDescription").value(item.getItemDescription()));
     }
 
