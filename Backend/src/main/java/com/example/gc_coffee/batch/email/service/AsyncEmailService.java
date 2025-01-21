@@ -1,7 +1,6 @@
 package com.example.gc_coffee.batch.email.service;
 
 import com.example.gc_coffee.domain.order.order.entity.Order;
-import com.example.gc_coffee.domain.order.order.entity.OrderStatus;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +26,7 @@ public class AsyncEmailService {
     public void sendOrderConfirmation(Order order) {
         log.info("Attempting to send email to {}", order.getEmail());
         try {
-            order.setOrderStatus(OrderStatus.COMPLETED); // 상태 업데이트
+            order.orderComplete(); // 상태 업데이트
 
             String email = order.getEmail();
             String subject = "Order Confirmation: " + order.getOrderNumber();

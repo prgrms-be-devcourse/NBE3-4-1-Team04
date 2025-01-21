@@ -19,7 +19,8 @@ public class OrderStatusUpdateSchedule {
     private final JobLauncher jobLauncher;
     private final JobRegistry jobRegistry;
 
-    @Scheduled(cron = "*/30 * * * * ?", zone = "Asia/Seoul") // 30초마다 실행
+//    @Scheduled(cron = "*/30 * * * * ?", zone = "Asia/Seoul") // 30초마다 실행 (테스팅용)
+    @Scheduled(cron = "0 0 14 * * ?", zone = "Asia/Seoul") // 매일 오후 2시에 실행
     public void runBatchJob() throws Exception {
         log.info("Order update schedule started");
 
