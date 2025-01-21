@@ -3,7 +3,6 @@ package com.example.gc_coffee.domain.item.dto;
 import com.example.gc_coffee.domain.item.entity.Category;
 import com.example.gc_coffee.domain.item.entity.Item;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -14,10 +13,7 @@ public class ItemDescriptionDto {
     private String itemName;   // 상품명
     private Category category; // 상품 카테고리
     private int itemPrice;     // 상품 가격
-
-    @JsonIgnore
     private String itemImage;  // 상품 이미지 URL
-
     private int quantity;      // 재고 수량
     private String itemDescription; // 상품 설명
 
@@ -34,12 +30,6 @@ public class ItemDescriptionDto {
         this.quantity = item.getStockQuantity();
         this.itemDescription = item.getItemDescription();
         this.isDeleted = item.isDeleted();
-    }
-
-    // JSON 직렬화 시 사용자 친화적인 출력
-    @JsonProperty("displayKey")
-    public String getDisplayKey() {
-        return String.format("%s (%d원)", itemName, itemPrice);
     }
 
     @Override

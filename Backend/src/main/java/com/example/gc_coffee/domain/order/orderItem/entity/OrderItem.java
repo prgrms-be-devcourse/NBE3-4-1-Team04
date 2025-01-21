@@ -50,4 +50,11 @@ public class OrderItem extends BaseEntity {
     public void linkOrder(Order order) {
         this.order = order;
     }
+
+    public void unlinkOrder() {
+        if (this.order != null) {
+            this.order.getOrderItems().remove(this);
+            this.order = null;
+        }
+    }
 } 

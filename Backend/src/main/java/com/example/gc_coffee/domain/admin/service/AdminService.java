@@ -36,7 +36,7 @@ public class AdminService {
 
     //주문 상태 수정
     public OrderResponse updateOrderStatus(Long orderId, OrderStatus orderStatus) {
-        return orderService.modify(orderId, orderStatus);
+        return orderService.updateOrderStatus(orderId, orderStatus);
     }
 
     //전체 주문 조회

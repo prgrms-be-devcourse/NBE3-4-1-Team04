@@ -16,10 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -85,6 +82,47 @@ public class OrderService {
         return order;
     }
 
+    public OrderResponse modify(Long orderId, String address, Map<Long, Integer> newItemList) {
+        // 주문 조회
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_ORDER));
+
+        // 주소 변경
+        if (address != null && !address.isEmpty()) {
+            order.setAddress(address);
+        }
+
+        // 기존 아이템 제거 및 재고 복구 (명시적으로 제거 목록 처리)
+        List<OrderItem> itemsToRemove = new ArrayList<>(order.getOrderItems());
+        for (OrderItem orderItem : itemsToRemove) {
+            orderItem.getItem().addStock(orderItem.getCount());
+            orderItem.unlinkOrder();
+        }
+        order.getOrderItems().clear();
+
+        // 새로운 아이템으로 초기화
+        newItemList.forEach((itemId, count) -> {
+            if (count > 0) {
+                Item item = itemRepository.findById(itemId)
+                        .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_ITEM));
+                item.removeStock(count);
+
+                OrderItem newOrderItem = new OrderItem();
+                newOrderItem.setItem(item);
+                newOrderItem.setCount(count);
+                order.addOrderItem(newOrderItem);
+            }
+        });
+
+        // 주문 총 가격 다시 계산
+        order.calculateOrderPrice();
+
+        // 변경사항 저장
+        orderRepository.save(order);
+
+        // 응답 생성 및 반환
+        return OrderResponse.of(order);
+    }
 
     public OrderResponse getOrderById(Long orderId) {
         Order order = orderRepository.findById(orderId)
@@ -125,7 +163,7 @@ public class OrderService {
     }
 
     @Transactional
-    public OrderResponse modify(long orderId, OrderStatus orderStatus) {
+    public OrderResponse updateOrderStatus(long orderId, OrderStatus orderStatus) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_ORDER));
         order.setOrderStatus(orderStatus);
