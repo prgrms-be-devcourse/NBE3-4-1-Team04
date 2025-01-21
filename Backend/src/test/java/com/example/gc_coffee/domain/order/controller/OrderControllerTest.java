@@ -178,5 +178,43 @@ public class OrderControllerTest {
                 .andExpect(jsonPath("$.titleMessageCode").value("problemDetail.title.com.example.gc_coffee.global.exceptions.BusinessException")); // 제목 코드 확인
     }
 
+    @Test
+    @DisplayName("초기 데이터 기반 주문 병합 테스트")
+    void t7_existOrderProcess() throws Exception {
+        // Given
+        String additionalOrderJson = """
+        {
+            "email": "user3@example.com",
+            "address": "서울시 서초구",
+            "items": {
+                "1": 3,
+                "4": 1
+            }
+        }
+        """;
+
+        // When
+        ResultActions resultActions = mvc.perform(
+                post("/api/orders")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(additionalOrderJson)
+                        .characterEncoding(StandardCharsets.UTF_8)
+        ).andDo(print());
+
+        // Calculate expected total price
+        int expectedOrderPrice =
+                (4 + 3) * 500 + // 탄맛 커피콩 (기존 4 + 추가 3)
+                4 * 400 +      // 탄맛 커피
+                4 * 300 +      // 탄맛 티
+                (4 + 1) * 200; // 탄맛 쥬스 (기존 4 + 추가 1)
+
+        // Then
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(handler().handlerType(OrderController.class))
+                .andExpect(handler().methodName("createOrder"))
+                .andExpect(jsonPath("$.orderPrice").value(expectedOrderPrice));
+    }
+
 
 }
