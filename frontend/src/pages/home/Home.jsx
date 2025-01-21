@@ -1,10 +1,10 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import Header from '../../components/header/Header.jsx';
+import Navigation from '../../components/navigation/Navigation.jsx';
+import Footer from '../../components/footer/Footer.jsx';
+import { productService } from '../../services/productService';
 import './Home.css';
-import Navigation from '../../components/navigation/Navigation';
-import Header from '../../components/header/Header';
-import {productService} from '../../services/productService';
-import {useNavigate} from 'react-router-dom';
-import Footer from '../../components/footer/Footer';
 
 const Home = () => {
     const [products, setProducts] = useState([]);
@@ -13,14 +13,19 @@ const Home = () => {
     const navigate = useNavigate();
 
     const navigateToAdmin = () => {
-        navigate('/administer'); // 관리자 페이지로 이동
+        navigate('/administer');
     };
 
     useEffect(() => {
         const fetchProducts = async () => {
             try {
+                // 임시 데이터로 Columbia Quindio를 품절 상태로 설정
                 const data = await productService.getAllProducts();
-                setProducts(data);
+                const updatedData = data.map(product => ({
+                    ...product,
+                    stock: product.name === "Columbia Quindio (400G)" ? 0 : product.stock
+                }));
+                setProducts(updatedData);
             } catch (error) {
                 console.error('상품 목록 로딩 실패:', error);
             } finally {
@@ -36,11 +41,11 @@ const Home = () => {
             if (existingItem) {
                 return prev.map(item =>
                     item.id === product.id
-                        ? {...item, quantity: item.quantity + 1}
+                        ? { ...item, quantity: item.quantity + 1 }
                         : item
                 );
             }
-            return [...prev, {...product, quantity: 1}];
+            return [...prev, { ...product, quantity: 1 }];
         });
     };
 
@@ -51,7 +56,7 @@ const Home = () => {
                 // 수량이 1보다 크면 하나만 차감
                 return prev.map(item =>
                     item.id === productId
-                        ? {...item, quantity: item.quantity - 1}
+                        ? { ...item, quantity: item.quantity - 1 }
                         : item
                 );
             } else {
@@ -70,29 +75,45 @@ const Home = () => {
             alert('주문할 상품을 선택해주세요.');
             return;
         }
-        // 주문 정보를 state로 전달
+
+        const selectedItems = orderItems.map(item => ({
+            id: item.id,
+            name: item.name,
+            price: item.price,
+            quantity: item.quantity,
+            imageUrl: item.imageUrl
+        }));
+
+        console.log('전달되는 상품 데이터:', selectedItems); // 데이터 확인용
+
         navigate('/payment', {
-            state: {
-                orderItems,
-                totalAmount: calculateTotal()
-            }
+            state: { selectedItems }
         });
     };
-
-
 
     return (
         <div className="app-container">
             <div className="content-wrapper">
-                <Header/>
+                <Header />
                 <button
                     className="admin-button"
                     onClick={navigateToAdmin}
+                    style={{
+                        position: 'absolute',
+                        top: '20px',
+                        right: '20px',
+                        padding: '8px 16px',
+                        backgroundColor: '#5C8A3C',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer'
+                    }}
                 >
                     관리자 페이지
                 </button>
-                <Navigation/>
-                <div className="container" style={{marginTop: '-10px'}}>
+                <Navigation />
+                <div className="container" style={{ marginTop: '-10px' }}>
                     <div className="row">
                         <div className="col-md-8">
                             {loading ? (
@@ -119,10 +140,7 @@ const Home = () => {
                                                     </div>
                                                     <div className="product-details">
                                                         <div className="product-name">{product.name}</div>
-                                                        <div
-                                                            className="price-per-unit">₩{product.pricePerGram.toLocaleString()} /
-                                                            100g
-                                                        </div>
+                                                        <div className="price-per-unit">₩{product.pricePerGram.toLocaleString()} / 100g</div>
                                                     </div>
                                                 </div>
                                                 <div className="right-section">
@@ -131,6 +149,12 @@ const Home = () => {
                                                         className={product.stock > 0 ? 'add-button' : 'soldout-button'}
                                                         disabled={product.stock === 0}
                                                         onClick={() => addToOrder(product)}
+                                                        style={product.stock === 0 ? {
+                                                            backgroundColor: '#000',
+                                                            color: '#fff',
+                                                            border: 'none',
+                                                            cursor: 'not-allowed'
+                                                        } : {}}
                                                     >
                                                         {product.stock > 0 ? '추가' : 'SoldOut'}
                                                     </button>
@@ -151,16 +175,20 @@ const Home = () => {
                                 <div className="card-header">
                                     <h5 className="mb-0">Order Summary</h5>
                                 </div>
-                                <div className="card-body"
-                                     style={{maxHeight: 'calc(100vh - 300px)', overflowY: 'auto'}}>
+                                <div className="card-body" style={{ maxHeight: 'calc(100vh - 300px)', overflowY: 'auto' }}>
                                     {orderItems.map(item => (
-                                        <div key={item.id}
-                                             className="d-flex justify-content-between align-items-center mb-2">
+                                        <div key={item.id} className="d-flex justify-content-between align-items-center mb-2">
                                             <span>{item.name}</span>
                                             <div className="d-flex align-items-center">
                                                 <span className="me-3">{item.quantity}개</span>
                                                 <button
-                                                    className="btn btn-outline-danger btn-sm"
+                                                    className="btn btn-sm"
+                                                    style={{
+                                                        backgroundColor: '#E86056',
+                                                        color: 'white',
+                                                        border: 'none',
+                                                        padding: '2px 8px'
+                                                    }}
                                                     onClick={() => removeFromOrder(item.id)}
                                                 >
                                                     취소
@@ -179,15 +207,27 @@ const Home = () => {
                             <div className="delivery-notice">
                                 • 당일 오후 2시 이후의 주문은 다음날 배송을 시작합니다.
                             </div>
-                            <div className="action-buttons">
+                            <div className="action-buttons" style={{ marginTop: '20px' }}>
                                 <button
-                                    className="payment-button"
+                                    className="btn w-100 mb-2"
+                                    style={{
+                                        backgroundColor: '#5C8A3C',
+                                        color: 'white',
+                                        border: 'none'
+                                    }}
                                     onClick={handlePayment}
-                                    disabled={orderItems.length === 0}
                                 >
                                     결제창으로 이동하기
                                 </button>
-                                <button className="history-button" onClick={() => navigate('/orders')}>
+                                <button
+                                    className="btn w-100"
+                                    style={{
+                                        backgroundColor: '#5C8A3C',
+                                        color: 'white',
+                                        border: 'none'
+                                    }}
+                                    onClick={() => navigate('/orders')}
+                                >
                                     주문내역 확인하기
                                 </button>
                             </div>
@@ -195,7 +235,7 @@ const Home = () => {
                     </div>
                 </div>
             </div>
-            <Footer/>
+            <Footer />
         </div>
     );
 };

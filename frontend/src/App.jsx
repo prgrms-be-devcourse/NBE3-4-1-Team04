@@ -8,6 +8,7 @@ const App = () => {
     return (
         <Suspense fallback={<div>Loading...</div>}>
             <Routes>
+
                 {/* 기존 routes 배열에 정의된 경로를 렌더링 */}
                 {routes.map((route) => (
                     <Route
@@ -16,9 +17,7 @@ const App = () => {
                         element={route.element}
                     />
 
-
                 ))}
-
             </Routes>
         </Suspense>
     );
