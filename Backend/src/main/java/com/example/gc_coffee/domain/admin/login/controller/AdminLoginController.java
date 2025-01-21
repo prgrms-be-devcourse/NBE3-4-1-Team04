@@ -10,9 +10,9 @@ public class AdminLoginController {
     public String loginPage() {
         return "admin/login"; // 로그인 페이지 경로 login.html 템플릿 반환
     }
-    //Todo dashboard 페이지 구현
-    @GetMapping("/admin/dashboard")
-    public String dashboard() {
-        return "admin/dashboard"; // 대시보드 페이지 경로
-    }
+    //Todo dashboard 페이지 프론트에서 구현
+//    @GetMapping("/admin/dashboard")
+//    public String dashboard() {
+//        return "admin/dashboard"; // 대시보드 페이지 경로
+//    }
 }

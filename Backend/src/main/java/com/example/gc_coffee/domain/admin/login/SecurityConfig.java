@@ -26,14 +26,12 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/admin/**", "/api/admin/**").hasRole("ADMIN") // "/admin/**" 경로는 ADMIN만 접근 가능
-                        .requestMatchers("/h2-console/**")
-                        .permitAll()
                         .anyRequest().permitAll() // 나머지 경로는 인증 없이 접근 가능
                 )
                 .formLogin(form -> form
                         .loginPage("/admin/login") // 사용자 정의 로그인 페이지 경로
                         .loginProcessingUrl("/admin/login") // 로그인 처리 URL
-                        .defaultSuccessUrl("/admin/dashboard", true) // 로그인 성공 후 이동 경로
+                        .defaultSuccessUrl("/swagger-ui/index.html", true) // 로그인 성공 후 이동 경로
                         .failureUrl("/admin/login?error=true") // 로그인 실패 시 이동 경로
                         .permitAll() // 로그인 페이지는 누구나 접근 가능
                 )
