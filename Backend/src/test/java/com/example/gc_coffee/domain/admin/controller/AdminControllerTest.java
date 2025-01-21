@@ -105,14 +105,14 @@ public class AdminControllerTest {
         // THEN: 응답 검증
         resultActions
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(4)); // 초기 데이터로 3개의 주문이 존재함
+                .andExpect(jsonPath("$.length()").value(2)); // 초기 데이터로 3개의 주문이 존재함
     }
 
     @Test
     @DisplayName("주문 상태 수정 테스트")
     void updateOrderStatusTest() throws Exception {
         // GIVEN: 상태를 수정할 주문 ID와 새로운 상태
-        Long orderId = 4L; // 상태를 수정할 주문 ID
+        Long orderId = 2L; // 상태를 수정할 주문 ID
         OrderStatus newStatus = OrderStatus.COMPLETED; // 변경할 상태
 
         // WHEN: 상태 수정 요청

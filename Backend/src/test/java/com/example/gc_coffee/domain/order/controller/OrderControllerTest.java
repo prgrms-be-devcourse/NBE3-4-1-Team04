@@ -141,7 +141,7 @@ public class OrderControllerTest {
 
         resultActions
                 .andExpect(status().isOk())
-                .andExpect(content().string("2"));
+                .andExpect(content().string("1")); // 주문 통합
     }
 
     @Test
