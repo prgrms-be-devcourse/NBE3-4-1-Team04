@@ -1,6 +1,5 @@
 package com.example.gc_coffee.domain.item.entity;
 
-import com.example.gc_coffee.domain.cart.entity.Cart;
 import com.example.gc_coffee.global.exceptions.BusinessException;
 import com.example.gc_coffee.global.exceptions.constant.ErrorCode;
 import com.example.gc_coffee.global.jpa.entity.BaseEntity;
@@ -35,10 +34,6 @@ public class Item extends BaseEntity {
 
     // Todo: 별도 관리해야할지 고민
     private String itemDescription; // 상품 설명
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cart_id")
-    private Cart cart; // 장바구니와의 관계
 
     /**
      * 비즈니스 메서드
