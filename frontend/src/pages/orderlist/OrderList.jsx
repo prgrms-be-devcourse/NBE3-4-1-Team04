@@ -49,7 +49,7 @@ const OrderList = () => {
                             { name: "Ethiopia Sidamo (400G)", quantity: 1, price: 22000 }
                         ],
                         totalAmount: 58000,
-                        status: "출고완료"
+                        status: "출고완료"  // "출고완료", "출고전", "취소" 중 하나로 표시
                     },
                     {
                         orderId: "250121111111",
@@ -99,6 +99,73 @@ const OrderList = () => {
         return '/images/coffee-bag.png';
     };
 
+    // 주문 아이템 취소 처리 함수
+    const handleCancelItem = (orderId, itemIndex) => {
+        setOrders(prevOrders => {
+            return prevOrders.map(order => {
+                if (order.orderId !== orderId) return order;
+
+                const updatedItems = [...order.items];
+                const item = updatedItems[itemIndex];
+
+                if (item.quantity > 1) {
+                    // 수량이 1보다 크면 하나 감소
+                    updatedItems[itemIndex] = {
+                        ...item,
+                        quantity: item.quantity - 1,
+                        price: (item.price / item.quantity) * (item.quantity - 1)
+                    };
+                } else {
+                    // 수량이 1이면 아이템 제거
+                    updatedItems.splice(itemIndex, 1);
+                }
+
+                // 총 금액 재계산
+                const newTotalAmount = updatedItems.reduce((sum, item) => sum + item.price, 0);
+
+                // 모든 아이템이 취소되었다면 주문 상태를 '취소'로 변경
+                const newStatus = updatedItems.length === 0 ? '취소' : order.status;
+
+                return {
+                    ...order,
+                    items: updatedItems,
+                    totalAmount: newTotalAmount,
+                    status: newStatus
+                };
+            });
+        });
+    };
+
+    // 취소 버튼 클릭 시 확인 메시지 표시
+    const confirmCancel = (orderId, itemIndex, itemName) => {
+        if (window.confirm(`${itemName} 상품을 취소하시겠습니까?`)) {
+            handleCancelItem(orderId, itemIndex);
+        }
+    };
+
+    // 전체 주문 취소 처리 함수 추가
+    const handleCancelOrder = (orderId) => {
+        setOrders(prevOrders => {
+            return prevOrders.map(order => {
+                if (order.orderId !== orderId) return order;
+                
+                return {
+                    ...order,
+                    items: [],
+                    totalAmount: 0,
+                    status: '취소'
+                };
+            });
+        });
+    };
+
+    // 전체 주문 취소 확인 함수 추가
+    const confirmCancelOrder = (orderId) => {
+        if (window.confirm('전체 주문을 취소하시겠습니까?')) {
+            handleCancelOrder(orderId);
+        }
+    };
+
     if (loading) {
         return <div>Loading...</div>;
     }
@@ -110,17 +177,22 @@ const OrderList = () => {
                 <Navigation />
                 <main className="container mt-5 mb-5">
                     {orders.map((order) => (
-                        <div key={order.orderId} className="card mb-4">
+                        <div key={order.orderId} className="card mb-4" style={{ backgroundColor: '#fdfbf6' }}>
                             <div className="card-body">
                                 <div className="d-flex justify-content-between align-items-center mb-4">
-                                    <h5 className="mb-0" style={{ color: '#5C8A3C', fontWeight: 'bold' }}>
+                                    <h5 className="mb-0" style={{ 
+                                        color: '#5C8A3C', 
+                                        fontWeight: 'bold',
+                                        fontSize: '1.3rem'
+                                    }}>
                                         주문번호 : {order.orderId}
                                     </h5>
                                     <div className="text-end">
-                                        <span className="badge" style={{
-                                            backgroundColor: order.status === '출고완료' ? '#dc3545' : '#5C8A3C',
-                                            padding: '8px 16px',
-                                            fontSize: '14px'
+                                        <span style={{
+                                            color: '#000000',
+                                            padding: '8px 20px',
+                                            fontSize: '1.1rem',
+                                            fontWeight: 'bold'
                                         }}>
                                             {order.status}
                                         </span>
@@ -143,14 +215,21 @@ const OrderList = () => {
                                             />
                                         </div>
                                         <div className="flex-grow-1">
-                                            <h6 className="mb-1">{item.name}</h6>
-                                            <p className="mb-0 text-success">₩{(item.price / item.quantity).toLocaleString()} / 1ea</p>
+                                            <h5 className="mb-2" style={{ fontSize: '1.3rem' }}>{item.name}</h5>
+                                            <p className="mb-0 text-success" style={{ fontSize: '1.1rem' }}>₩{(item.price / item.quantity).toLocaleString()} / 1ea</p>
                                         </div>
                                         <div className="d-flex align-items-center" style={{ minWidth: '350px' }}>
                                             <div className="ms-auto d-flex align-items-center">
-                                                <span className="me-5" style={{ minWidth: '60px', textAlign: 'center' }}>{item.quantity}개</span>
-                                                <span className="me-5 fw-bold" style={{ minWidth: '100px', textAlign: 'right' }}>₩{item.price.toLocaleString()}</span>
-                                                <button className="btn btn-sm btn-danger" style={{ minWidth: '60px' }}>취소</button>
+                                                <span className="me-7" style={{ minWidth: '60px', textAlign: 'center', fontSize: '1.2rem' }}>{item.quantity}개</span>
+                                                <span className="me-5 fw-bold" style={{ minWidth: '100px', textAlign: 'right', fontSize: '1.2rem' }}>₩{item.price.toLocaleString()}</span>
+                                                <button 
+                                                    className="btn btn-sm btn-danger" 
+                                                    style={{ minWidth: '60px' }}
+                                                    onClick={() => confirmCancel(order.orderId, index, item.name)}
+                                                    disabled={order.status === '취소'}  // 이미 취소된 주문은 비활성화
+                                                >
+                                                    취소
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
@@ -167,43 +246,98 @@ const OrderList = () => {
                                 </div>
 
                                 <div className="mt-4">
-                                    <div className="card bg-light">
+                                    <div className="card bg-light" style={{ backgroundColor: '#fff' }}>  {/* Order Information 카드 배경색 흰색으로 설정 */}
                                         <div className="card-body">
                                             <div className="row">
-                                                <div className="col-md-6">
-                                                    <h5 className="card-title mb-1" style={{ color: '#5C8A3C' }}>Order</h5>
-                                                    <h5 className="card-title mb-3" style={{ color: '#5C8A3C' }}>Information</h5>
+                                                <div className="col-md-3">
+                                                    <div style={{ 
+                                                        color: '#5C8A3C',
+                                                        fontSize: '3rem',
+                                                        fontWeight: 'bold',
+                                                        lineHeight: '1.2',
+                                                        position: 'relative',
+                                                        marginTop: '20px',
+                                                        textAlign: 'center'
+                                                    }}>
+                                                        <div>Order</div>
+                                                        <div>Information</div>
+                                                    </div>
+                                                </div>
+                                                <div className="col-md-6" style={{ paddingLeft: '50px' }}>
                                                     <table className="table table-sm table-borderless mb-0">
                                                         <tbody>
                                                             <tr>
-                                                                <td style={{ width: '120px' }}>이메일 주소</td>
-                                                                <td>{order.email}</td>
+                                                                <td style={{ 
+                                                                    width: '300px', 
+                                                                    fontSize: '1.2rem', 
+                                                                    fontWeight: '600',
+                                                                    paddingLeft: '50px'
+                                                                }}>이메일 주소</td>
+                                                                <td style={{ 
+                                                                    fontSize: '1.2rem', 
+                                                                    fontWeight: 'bold'
+                                                                }}>{order.email}</td>
                                                             </tr>
                                                             <tr>
-                                                                <td>배송지 주소</td>
-                                                                <td>경상남도 거제시 00동</td>
+                                                                <td style={{ 
+                                                                    fontSize: '1.2rem', 
+                                                                    fontWeight: '600',
+                                                                    paddingLeft: '50px'
+                                                                }}>배송지 주소</td>
+                                                                <td style={{ 
+                                                                    fontSize: '1.2rem', 
+                                                                    fontWeight: 'bold'
+                                                                }}>경상남도 거제시 00동</td>
                                                             </tr>
                                                             <tr>
-                                                                <td>주문번호</td>
-                                                                <td>{order.orderId}</td>
+                                                                <td style={{ 
+                                                                    fontSize: '1.2rem', 
+                                                                    fontWeight: '600',
+                                                                    paddingLeft: '50px'
+                                                                }}>주문번호</td>
+                                                                <td style={{ 
+                                                                    fontSize: '1.2rem', 
+                                                                    fontWeight: 'bold'
+                                                                }}>{order.orderId}</td>
                                                             </tr>
                                                             <tr>
-                                                                <td>주문시간</td>
-                                                                <td>2025-01-14 14:05:15</td>
+                                                                <td style={{ 
+                                                                    fontSize: '1.2rem', 
+                                                                    fontWeight: '600',
+                                                                    paddingLeft: '50px'
+                                                                }}>주문시간</td>
+                                                                <td style={{ 
+                                                                    fontSize: '1.2rem', 
+                                                                    fontWeight: 'bold'
+                                                                }}>2025-01-14 14:05:15</td>
                                                             </tr>
                                                             <tr>
-                                                                <td>배송예정일자</td>
-                                                                <td>2025-01-15 14:00:00</td>
+                                                                <td style={{ 
+                                                                    fontSize: '1.2rem', 
+                                                                    fontWeight: '600',
+                                                                    paddingLeft: '50px'
+                                                                }}>배송예정일자</td>
+                                                                <td style={{ 
+                                                                    fontSize: '1.2rem', 
+                                                                    fontWeight: 'bold'
+                                                                }}>2025-01-15 14:00:00</td>
                                                             </tr>
                                                         </tbody>
                                                     </table>
                                                 </div>
-                                                <div className="col-md-6 text-end d-flex align-items-center justify-content-end">
-                                                    <button className="btn btn-success" style={{
-                                                        padding: '50px 30px',
-                                                        borderRadius: '8px',
-                                                        fontSize: '1.1rem'
-                                                    }}>
+                                                <div className="col-md-3 d-flex align-items-center justify-content-end">
+                                                    <button 
+                                                        className="btn btn-success" 
+                                                        style={{
+                                                            backgroundColor: '#5C8A3C',
+                                                            padding: '60px 25px',
+                                                            borderRadius: '8px',
+                                                            fontSize: '1.1rem',
+                                                            whiteSpace: 'nowrap'
+                                                        }}
+                                                        onClick={() => confirmCancelOrder(order.orderId)}
+                                                        disabled={order.status === '취소' || order.items.length === 0}  // 이미 취소되었거나 아이템이 없는 경우 비활성화
+                                                    >
                                                         전체주문취소
                                                     </button>
                                                 </div>

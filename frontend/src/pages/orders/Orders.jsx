@@ -10,17 +10,29 @@ const Orders = () => {
     const navigate = useNavigate();
 
     const handleSearch = () => {
+        // 입력값이 비어있는 경우
         if (!searchValue.trim()) {
             alert(searchType === 'orderNumber' ? '주문번호를 입력해주세요.' : '이메일을 입력해주세요.');
             return;
         }
 
-        if (searchType === 'email' && !isValidEmail(searchValue)) {
-            alert('유효한 이메일 주소를 입력해주세요.');
-            return;
+        // 주문번호 검증
+        if (searchType === 'orderNumber') {
+            if (!/^\d{12}$/.test(searchValue)) {  // 12자리 숫자인지 확인
+                alert('올바른 주문번호 형식이 아닙니다.\n주문번호는 12자리 숫자입니다.\n예시) 250114123456');
+                return;
+            }
         }
 
-        // OrderList 페이지로 이동하면서 검색 정보 전달
+        // 이메일 검증
+        if (searchType === 'email') {
+            if (!isValidEmail(searchValue)) {
+                alert('올바른 이메일 주소 형식이 아닙니다.\n예시) test@example.com');
+                return;
+            }
+        }
+
+        // 검증 통과 시 OrderList 페이지로 이동
         navigate('/orderlist', {
             state: {
                 searchType,
@@ -30,7 +42,8 @@ const Orders = () => {
     };
 
     const isValidEmail = (email) => {
-        return email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/);
+        const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+        return emailRegex.test(email);
     };
 
     return (
@@ -116,7 +129,7 @@ const Orders = () => {
                                                 <input
                                                     type="email"
                                                     className="form-control form-control-lg"
-                                                    placeholder="이메일 예시) Grids&Circles@gamil.com"
+                                                    placeholder="이메일 예시) test@example.com"
                                                     value={searchValue}
                                                     onChange={(e) => setSearchValue(e.target.value)}
                                                 />
