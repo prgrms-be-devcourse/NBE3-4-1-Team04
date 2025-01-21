@@ -1,12 +1,16 @@
 import React from "react";
 
 const Footer = () => {
-    const currentYear = new Date().getFullYear(); // 현재 연도 가져오기
+    const currentYear = new Date().getFullYear();
     return (
-        <footer className="py-5 bg-dark">
-        <div className="container"><p className="m-0 text-center text-white">Copyright &copy; Backend First Project {currentYear}</p>
-        </div>
-    </footer>
+        <footer>
+            <div className="container">
+                <p className="text-center text-white">
+                    Copyright &copy; 2025 Programmers Devcourse NBE 3-4-4 {currentYear}
+                </p>
+            </div>
+        </footer>
     );
 };
+
 export default Footer;

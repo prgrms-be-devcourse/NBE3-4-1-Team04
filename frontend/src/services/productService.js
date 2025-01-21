@@ -1,40 +1,52 @@
 const API_BASE_URL = '/api';
 
+const products = [
+    {
+        id: 1,
+        name: 'Columbia Narino (400G)',
+        imageUrl: '/images/coffee-1.png',
+        price: 20000,
+        pricePerGram: 5000,
+        stock: 10,
+        weight: '400G'
+    },
+    {
+        id: 2,
+        name: 'Brazil Serra Do Caparao (400G)',
+        imageUrl: '/images/coffee-2.png',
+        price: 16000,
+        pricePerGram: 4000,
+        stock: 15,
+        weight: '400G'
+    },
+    {
+        id: 3,
+        name: 'Ethiopia Sidamo (400G)',
+        imageUrl: '/images/coffee-3.png',
+        price: 18000,
+        pricePerGram: 4500,
+        stock: 8,
+        weight: '400G'
+    },
+    {
+        id: 4,
+        name: 'Columbia Quindio (400G)',
+        imageUrl: '/images/coffee-4.png',
+        price: 22000,
+        pricePerGram: 5500,
+        stock: 0,
+        weight: '400G'
+    }
+];
+
 export const productService = {
-    async getAllProducts() {
-        try {
-            console.log('Fetching products...');
-            const response = await fetch(`${API_BASE_URL}/items?page=1&pageSize=10`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                },
-            });
-            
-            if (!response.ok) {
-                const errorData = await response.text();
-                console.error('Server response:', errorData);
-                throw new Error(`서버 오류: ${response.status}`);
-            }
-            
-            const data = await response.json();
-            console.log('Received data:', data);
-            
-            const items = data.content || [];
-            
-            return items.map(item => ({
-                id: item.id,
-                name: item.itemName,
-                price: item.itemPrice,
-                pricePerGram: Math.floor(item.itemPrice / 4),
-                stock: item.itemQuantity,
-                imageUrl: item.itemImage || '/coffee-default.jpg'
-            }));
-        } catch (error) {
-            console.error('Error fetching products:', error);
-            throw error;
-        }
+    getAllProducts: async () => {
+        // 실제 API 호출을 시뮬레이션
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                resolve(products);
+            }, 500);
+        });
     },
 
     async getProductById(id) {

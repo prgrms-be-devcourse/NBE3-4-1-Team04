@@ -30,11 +30,11 @@ public class ItemController {
     ) {
         return ResponseEntity.ok()
                 .body(
-                new PageDto<>(
-                        itemService.findByPaged(searchKeyword, page, pageSize)
-                                .map(ItemDto::new)
-                )
-        );
+                        new PageDto<>(
+                                itemService.findByPaged(searchKeyword, page, pageSize)
+                                        .map(ItemDto::new)
+                        )
+                );
     }
 
     // 단건 상세내용 조회 (클릭 시 보이는 화면)
@@ -46,8 +46,8 @@ public class ItemController {
         return ResponseEntity.ok()
                 .body(
                         itemService.findById(item_id)
-                        .map(ItemDescriptionDto::new)
-                        .orElseThrow()
+                                .map(ItemDescriptionDto::new)
+                                .orElseThrow()
                 );
 
     }
