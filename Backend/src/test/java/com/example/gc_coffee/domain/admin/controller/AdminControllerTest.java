@@ -5,7 +5,6 @@ import com.example.gc_coffee.domain.item.entity.Category;
 import com.example.gc_coffee.domain.item.entity.Item;
 import com.example.gc_coffee.domain.item.service.ItemService;
 import com.example.gc_coffee.domain.order.order.entity.OrderStatus;
-import com.example.gc_coffee.domain.order.order.service.OrderService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -30,13 +30,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
+@WithMockUser(username = "admin", roles = {"ADMIN"}) //Admin 테스트
 public class AdminControllerTest {
 
     @Autowired
     private ItemService itemService;
-
-    @Autowired
-    private OrderService orderService;
 
     @Autowired
     private MockMvc mvc;
