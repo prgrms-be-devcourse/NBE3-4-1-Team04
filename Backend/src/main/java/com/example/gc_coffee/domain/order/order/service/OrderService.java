@@ -33,11 +33,47 @@ public class OrderService {
 
 
     public OrderResponse createOrder(OrderRequest orderRequest) {
-        // 주문 번호 생성
-        String orderNumber = generateOrderNumber(LocalDateTime.now());
+        // 동일 이메일로 ORDERED 상태의 주문이 있는지 확인
+        Optional<Order> existingOrderOpt = findExistingOrder(orderRequest.getEmail());
 
-        // OrderItem 리스트 생성
-        List<OrderItem> orderItemList = createOrderItems(orderRequest);
+        // 새로운 OrderItem 리스트 생성
+        List<OrderItem> newOrderItems = createOrderItems(orderRequest);
+
+        Order order = existingOrderOpt
+                .map(existingOrder -> {
+                    // 기존 주문에 항목 추가 (병합 로직은 addOrderItem에서 처리)
+                    newOrderItems.forEach(existingOrder::addOrderItem);
+                    existingOrder.calculateOrderPrice();
+                    return existingOrder;
+                })
+                .orElseGet(() -> {
+                    // 새 주문 생성
+                    return createNewOrder(orderRequest, newOrderItems);
+                });
+
+        saveOrderAndItems(order);
+
+        return OrderResponse.of(order);
+    }
+
+
+    //동일한 이메일의 주문 완료 이전인 주문을 조회
+    private Optional<Order> findExistingOrder(String email) {
+        return orderRepository.findAllByEmail(email).stream()
+                .filter(order -> order.getOrderStatus() == OrderStatus.ORDERED)
+                .findFirst();
+    }
+
+    //이미 존재하는 주문에 아이템 추가
+    private Order addItemsToExistingOrder(Order existingOrder, List<OrderItem> orderItemList) {
+        orderItemList.forEach(existingOrder::addOrderItem);
+        existingOrder.calculateOrderPrice();
+        return existingOrder;
+    }
+
+    //새로운 주문
+    private Order createNewOrder(OrderRequest orderRequest, List<OrderItem> orderItemList) {
+        String orderNumber = generateOrderNumber(LocalDateTime.now()); //주문 번호
 
         Order order = Order.createOrder(
                 orderRequest.getEmail(),
@@ -46,13 +82,10 @@ public class OrderService {
                 orderItemList
         );
 
-        // 총 주문 가격 계산
-        order.calculateOrderPrice();
-
-        saveOrderAndItems(order);
-
-        return OrderResponse.of(order);
+        order.calculateOrderPrice(); // 총 가격 계산
+        return order;
     }
+
 
     public OrderResponse getOrderById(Long orderId) {
         Order order = orderRepository.findById(orderId)
@@ -136,5 +169,9 @@ public class OrderService {
         String datePart = dateTime.format(java.time.format.DateTimeFormatter.ofPattern("yyMMdd"));
         String uniquePart = UUID.randomUUID().toString().substring(0, 6).toUpperCase();
         return "ORDER-" + datePart + uniquePart;
+    }
+
+    public void flush() {
+        orderRepository.flush();
     }
 }

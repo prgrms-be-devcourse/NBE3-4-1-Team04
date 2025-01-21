@@ -65,8 +65,20 @@ public class Order extends BaseEntity {
      * 연관관계 편의 메서드
      */
     public void addOrderItem(OrderItem orderItem) {
-        this.orderItems.add(orderItem);
-        orderItem.linkOrder(this);
+        // 기존 항목 검색
+        OrderItem existingOrderItem = this.orderItems.stream()
+                .filter(oi -> oi.getItem().equals(orderItem.getItem()))
+                .findFirst()
+                .orElse(null);
+
+        if (existingOrderItem != null) {
+            // 기존 항목이 있을 경우 수량 증가
+            existingOrderItem.setCount(existingOrderItem.getCount() + orderItem.getCount());
+        } else {
+            // 기존 항목이 없을 경우 새 항목 추가
+            this.orderItems.add(orderItem);
+            orderItem.linkOrder(this);
+        }
     }
 
     /**
