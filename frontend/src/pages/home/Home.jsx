@@ -24,36 +24,51 @@ const Home = () => {
             }
         };
         fetchProducts();
+
+        // Local Storage에서 주문 아이템 불러오기
+        const savedOrderItems = JSON.parse(localStorage.getItem('orderItems'));
+        if (savedOrderItems) {
+            setOrderItems(savedOrderItems);
+        }
     }, []);
+
+    const saveToLocalStorage = (items) => {
+        localStorage.setItem('orderItems', JSON.stringify(items));
+    };
 
     const addToOrder = (product) => {
         setOrderItems(prev => {
             const existingItem = prev.find(item => item.id === product.id);
+            let newOrderItems;
             if (existingItem) {
-                return prev.map(item => 
-                    item.id === product.id 
+                newOrderItems = prev.map(item =>
+                    item.id === product.id
                         ? { ...item, quantity: item.quantity + 1 }
                         : item
                 );
+            } else {
+                newOrderItems = [...prev, { ...product, quantity: 1 }];
             }
-            return [...prev, { ...product, quantity: 1 }];
+            saveToLocalStorage(newOrderItems);
+            return newOrderItems;
         });
     };
 
     const removeFromOrder = (productId) => {
         setOrderItems(prev => {
             const existingItem = prev.find(item => item.id === productId);
+            let newOrderItems;
             if (existingItem.quantity > 1) {
-                // 수량이 1보다 크면 하나만 차감
-                return prev.map(item => 
-                    item.id === productId 
+                newOrderItems = prev.map(item =>
+                    item.id === productId
                         ? { ...item, quantity: item.quantity - 1 }
                         : item
                 );
             } else {
-                // 수량이 1이면 완전히 제거
-                return prev.filter(item => item.id !== productId);
+                newOrderItems = prev.filter(item => item.id !== productId);
             }
+            saveToLocalStorage(newOrderItems);
+            return newOrderItems;
         });
     };
 
@@ -127,8 +142,8 @@ const Home = () => {
                             )}
                         </div>
                         <div className="col-md-4">
-                            <div className="card" style={{ 
-                                position: 'sticky', 
+                            <div className="card" style={{
+                                position: 'sticky',
                                 top: '80px',
                                 zIndex: 100,
                                 marginTop: '20px'
