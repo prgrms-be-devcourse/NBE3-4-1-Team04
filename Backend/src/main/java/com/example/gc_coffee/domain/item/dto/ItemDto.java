@@ -38,8 +38,16 @@ public class ItemDto {
         this.category = item.getCategory();
         this.itemPrice = item.getItemPrice();
         this.itemImage = item.getItemImage();
-        this.quantity = item.getQuantity();
+        this.quantity = item.getStockQuantity();
         this.itemDescription = item.getItemDescription();
+    }
 
+    @Override
+    public String toString() {
+        return "ItemDto" + id + "{" +
+                ", itemName='" + itemName + '\'' +
+                ", itemPrice=" + itemPrice +
+                ", itemDescription='" + itemDescription + '\'' +
+                '}';
     }
 }

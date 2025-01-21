@@ -23,8 +23,22 @@ public class ItemDescriptionDto {
         this.category = item.getCategory();
         this.itemPrice = item.getItemPrice();
         this.itemImage = item.getItemImage();
-        this.quantity = item.getQuantity();
+        this.quantity = item.getStockQuantity();
         this.itemDescription = item.getItemDescription();
         this.isDeleted = item.isDeleted();
+    }
+
+    @Override
+    public String toString() {
+        return "ItemDescriptionDto{" +
+                "id=" + id +
+                ", itemName='" + itemName + '\'' +
+                ", category=" + category +
+                ", itemPrice=" + itemPrice +
+                ", itemImage='" + itemImage + '\'' +
+                ", quantity=" + quantity +
+                ", itemDescription='" + itemDescription + '\'' +
+                ", isDeleted=" + isDeleted +
+                '}';
     }
 }
