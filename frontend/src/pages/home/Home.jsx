@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import './Home.css';
 import Navigation from '../../components/navigation/Navigation';
 import Header from '../../components/header/Header';
-import { productService } from '../../services/productService';
-import { useNavigate } from 'react-router-dom';
+import {productService} from '../../services/productService';
+import {useNavigate} from 'react-router-dom';
 import Footer from '../../components/footer/Footer';
 
 const Home = () => {
@@ -11,6 +11,10 @@ const Home = () => {
     const [loading, setLoading] = useState(true);
     const [orderItems, setOrderItems] = useState([]);
     const navigate = useNavigate();
+
+    const navigateToAdmin = () => {
+        navigate('/administer'); // 관리자 페이지로 이동
+    };
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -30,13 +34,13 @@ const Home = () => {
         setOrderItems(prev => {
             const existingItem = prev.find(item => item.id === product.id);
             if (existingItem) {
-                return prev.map(item => 
-                    item.id === product.id 
-                        ? { ...item, quantity: item.quantity + 1 }
+                return prev.map(item =>
+                    item.id === product.id
+                        ? {...item, quantity: item.quantity + 1}
                         : item
                 );
             }
-            return [...prev, { ...product, quantity: 1 }];
+            return [...prev, {...product, quantity: 1}];
         });
     };
 
@@ -45,9 +49,9 @@ const Home = () => {
             const existingItem = prev.find(item => item.id === productId);
             if (existingItem.quantity > 1) {
                 // 수량이 1보다 크면 하나만 차감
-                return prev.map(item => 
-                    item.id === productId 
-                        ? { ...item, quantity: item.quantity - 1 }
+                return prev.map(item =>
+                    item.id === productId
+                        ? {...item, quantity: item.quantity - 1}
                         : item
                 );
             } else {
@@ -67,20 +71,28 @@ const Home = () => {
             return;
         }
         // 주문 정보를 state로 전달
-        navigate('/payment', { 
-            state: { 
+        navigate('/payment', {
+            state: {
                 orderItems,
                 totalAmount: calculateTotal()
-            } 
+            }
         });
     };
+
+
 
     return (
         <div className="app-container">
             <div className="content-wrapper">
-                <Header />
-                <Navigation />
-                <div className="container" style={{ marginTop: '-10px' }}>
+                <Header/>
+                <button
+                    className="admin-button"
+                    onClick={navigateToAdmin}
+                >
+                    관리자 페이지
+                </button>
+                <Navigation/>
+                <div className="container" style={{marginTop: '-10px'}}>
                     <div className="row">
                         <div className="col-md-8">
                             {loading ? (
@@ -107,12 +119,15 @@ const Home = () => {
                                                     </div>
                                                     <div className="product-details">
                                                         <div className="product-name">{product.name}</div>
-                                                        <div className="price-per-unit">₩{product.pricePerGram.toLocaleString()} / 100g</div>
+                                                        <div
+                                                            className="price-per-unit">₩{product.pricePerGram.toLocaleString()} /
+                                                            100g
+                                                        </div>
                                                     </div>
                                                 </div>
                                                 <div className="right-section">
                                                     <div className="price">₩{product.price.toLocaleString()}</div>
-                                                    <button 
+                                                    <button
                                                         className={product.stock > 0 ? 'add-button' : 'soldout-button'}
                                                         disabled={product.stock === 0}
                                                         onClick={() => addToOrder(product)}
@@ -127,8 +142,8 @@ const Home = () => {
                             )}
                         </div>
                         <div className="col-md-4">
-                            <div className="card" style={{ 
-                                position: 'sticky', 
+                            <div className="card" style={{
+                                position: 'sticky',
                                 top: '80px',
                                 zIndex: 100,
                                 marginTop: '20px'
@@ -136,13 +151,15 @@ const Home = () => {
                                 <div className="card-header">
                                     <h5 className="mb-0">Order Summary</h5>
                                 </div>
-                                <div className="card-body" style={{ maxHeight: 'calc(100vh - 300px)', overflowY: 'auto' }}>
+                                <div className="card-body"
+                                     style={{maxHeight: 'calc(100vh - 300px)', overflowY: 'auto'}}>
                                     {orderItems.map(item => (
-                                        <div key={item.id} className="d-flex justify-content-between align-items-center mb-2">
+                                        <div key={item.id}
+                                             className="d-flex justify-content-between align-items-center mb-2">
                                             <span>{item.name}</span>
                                             <div className="d-flex align-items-center">
                                                 <span className="me-3">{item.quantity}개</span>
-                                                <button 
+                                                <button
                                                     className="btn btn-outline-danger btn-sm"
                                                     onClick={() => removeFromOrder(item.id)}
                                                 >
@@ -163,8 +180,8 @@ const Home = () => {
                                 • 당일 오후 2시 이후의 주문은 다음날 배송을 시작합니다.
                             </div>
                             <div className="action-buttons">
-                                <button 
-                                    className="payment-button" 
+                                <button
+                                    className="payment-button"
                                     onClick={handlePayment}
                                     disabled={orderItems.length === 0}
                                 >
@@ -178,7 +195,7 @@ const Home = () => {
                     </div>
                 </div>
             </div>
-            <Footer />
+            <Footer/>
         </div>
     );
 };
