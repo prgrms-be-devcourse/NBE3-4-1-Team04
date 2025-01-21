@@ -29,7 +29,7 @@ class AdminLoginTest {
                         .param("password", "admin_team4")
                         .with(SecurityMockMvcRequestPostProcessors.csrf()))
                 .andExpect(status().isFound()) // 로그인 성공 시 302 리다이렉트
-                .andExpect(redirectedUrl("/templates/admin/dashboard")); // 성공 후 리다이렉션 URL 확인
+                .andExpect(redirectedUrl("/swagger-ui/index.html")); // 성공 후 리다이렉션 URL 확인
     }
 
     @Test
@@ -41,7 +41,7 @@ class AdminLoginTest {
                         .param("password", "wrong_password")
                         .with(SecurityMockMvcRequestPostProcessors.csrf()))
                 .andExpect(status().isFound()) // 실패 시 리다이렉션
-                .andExpect(redirectedUrl("/templates/admin/login?error=true")); // 실패 후 리다이렉션 URL 확인
+                .andExpect(redirectedUrl("/admin/login?error=true")); // 실패 후 리다이렉션 URL 확인
     }
 
     @Test
@@ -53,6 +53,6 @@ class AdminLoginTest {
                         .param("password", "admin_team4")
                         .with(SecurityMockMvcRequestPostProcessors.csrf())) // CSRF 토큰 추가
                 .andExpect(status().isFound()) // 실패 시 리다이렉션
-                .andExpect(redirectedUrl("/templates/admin/login?error=true")); // 실패 후 리다이렉션 URL 확인
+                .andExpect(redirectedUrl("/admin/login?error=true")); // 실패 후 리다이렉션 URL 확인
     }
 }
